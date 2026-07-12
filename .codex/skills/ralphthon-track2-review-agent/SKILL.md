@@ -21,7 +21,7 @@ Use `scripts/run_batch.py` for deterministic BUILD and mock-only DRY-RUN executi
 
 ## Freeze before Worker execution
 
-For every paper, hash the paper, evidence bundle, schema, worker prompt, and agent version into a per-paper manifest. Refuse a rerun when an existing manifest identity differs. Pass the immutable manifest and one active lease to a Worker.
+For every paper, hash the paper, evidence bundle, schema, canonical task-prompt asset, and agent version into a per-paper manifest. Separately verify `staging/ralphthon-track2-review-agent.sha256` and record that wrapper-manifest SHA in batch metadata; it freezes the native developer instructions that are not represented by per-paper `prompt_hash`. Refuse a rerun when an existing manifest identity differs. Pass the immutable manifest and one active lease to a Worker.
 
 ## Enforce authority
 
@@ -34,6 +34,20 @@ Before claim or post, query status. After a claim or post timeout, query status 
 Keep upstream `contribution` and event `significance`, `originality`, and `comment` as independent fields. Never derive, alias, average, or convert them. Validate every score, evidence location, frozen hash, paper ID, lease ID, and timestamp with `scripts/validate_review.py` before Root creates a platform payload.
 
 Allow one targeted repair for malformed or invalid Worker output. If it remains invalid, preserve the failure and continue the batch.
+
+## Risk-gated calibration
+
+Run the deterministic validator first. Do not send every draft to the verifier. Root assigns a risk score and sends only a schema-valid draft scoring at least 3 to `track2-review-verifier` in draft-calibration mode:
+
+- +3 when a central numerical, table, proof, or citation claim lacks a matching evidence location or conflicts with that location;
+- +2 when extraction is degraded or the Worker explicitly marks central evidence uncertain;
+- +2 when an extreme recommendation conflicts with the axis scores or lacks a rationale;
+- +1 when a borderline axis score lacks a borderline rationale; and
+- +1 when high confidence has fewer than two auditable evidence locations.
+
+Values such as `confidence <= 3`, `overall_recommendation <= 2`, or `overall_recommendation >= 5` are indicators only and never sufficient by themselves. Bound verifier work to `min(3, ceil(assigned_count * 0.3))` papers, one verifier at a time, 20 seconds and three findings per paper. Use it only before T+15 while validated backlog is at most two and posting pace is on target; bypass it in fast/emergency mode or after any repair. With a four-slot Root-plus-three-Worker budget, reuse a Worker slot only after that Worker has no pending draft assignment.
+
+Verifier output is advisory PASS or REPAIR with exact field paths and paper locations, never a rewritten review. Schema repair and calibration repair share one targeted-repair budget per paper. Root may request only the named fields once, then reruns deterministic validation without invoking the verifier again. Identity errors never enter this path.
 
 ## Preserve fallback artifacts
 

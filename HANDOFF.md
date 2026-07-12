@@ -25,6 +25,12 @@ custom native roles. No production claim or post occurred; the actual
 OpenAgentReview contract and live completion remain unverified until the
 authorized 16:35 KST window.
 
+The final performance pass adds evidence-first Worker calibration and a bounded
+high-risk verifier lane without changing the three-Worker fast path or frozen
+ReviewDraft schema. The verifier is capped at ceil(30%)/three papers, one at a time
+for 20 seconds, before T+15 and only with backlog at most two. It shares the
+single repair budget and has no platform or ledger authority.
+
 ## P0 acceptance status
 
 | P0 gate | Status | Evidence or blocker |
@@ -40,6 +46,7 @@ authorized 16:35 KST window.
 | Bounded queue, lease, atomic ledger, idempotency, status-first reconciliation | PASS IN SYNTHETIC MOCK | Frozen aggregate plus ledger and failure evidence |
 | Gold fixture, matching rule, threshold, and naive baseline frozen before run | PASS | `fixtures/FROZEN_MANIFEST.sha256` and fixture validation evidence |
 | Three 10-paper repetitions | PASS IN SYNTHETIC MOCK | 30/30 complete, schema 100%, duplicate posts 0 |
+| Evidence-first and risk-gated calibration | PASS BY CONTRACT AND FRESH EVALUATOR | Native Worker instructions 2,224/4,096 bytes; compound gate, ceil(30%)/three-paper cap, 20-second bound; `evidence/performance-optimization.json` |
 | Malformed JSON, Worker timeout, claim timeout, post timeout, in-process ledger reopen | PASS IN SYNTHETIC MOCK | Each condition recovered once without duplicate posts |
 | Actual process interruption and fresh-process resume | PASS IN SYNTHETIC MOCK | `evidence/process-restart-proof/aggregate.json`; exit 75 to 0, final 10/10, prefix and prior artifacts preserved |
 | Process rerun idempotency | PASS IN SYNTHETIC MOCK | Ledger and outbox byte-identical after rerun |
@@ -99,12 +106,12 @@ papers. The deterministic seeded-quality result must not be described as a
 blind or live agent score. The Worker-timeout result is mock-adapter
 `TimeoutError` recovery, not proof that a running thread was forcibly killed.
 
-The canonical frozen prompt SHA-256 is
+The canonical frozen task-prompt asset SHA-256 is
 `29e116b4b25663b65ff9920057a87d2b850080b97be836b364149cb95d9d914a`.
 The canonical frozen schema SHA-256 is
 `cd19220f5435dc1da4146bd7c1e467cf4bea0ac0ecb69b2ac518b53922363d24`.
 The wrapper manifest SHA-256 is
-`daa71e174640dbc135f9a735bb4d42db99dba4e7abd7802b7aeb7866ac75c7f3`.
+`38f2c01d2d27d3f8451f97167a3fbec9b11bfa4723d1f8ca72e0484723a9d0f7`.
 
 ## Skill and agent installation
 
@@ -246,7 +253,7 @@ b1a8c476f9bf0718d4a64c7192467fad588fe7a35f25380a9d363696548db18f  submission/tec
 - Report build and audit evidence: `evidence/report/`
 - Upstream Skill manifest: `staging/auto-research.sha256`
 - Wrapper and agent manifest: `staging/ralphthon-track2-review-agent.sha256`,
-  SHA-256 `daa71e174640dbc135f9a735bb4d42db99dba4e7abd7802b7aeb7866ac75c7f3`
+  SHA-256 `38f2c01d2d27d3f8451f97167a3fbec9b11bfa4723d1f8ca72e0484723a9d0f7`
 - Staged package validation: `evidence/discovery/staged-codex-validation.txt`
 - Post-Ralph install and fresh-session discovery:
   `evidence/external-final-verification.json`, SHA-256

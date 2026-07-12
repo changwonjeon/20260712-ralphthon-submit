@@ -28,6 +28,7 @@ claim review quality on unseen research.
 | Combined project-local package | PASS | 28/28 exact installer read-back matches |
 | Fresh Codex-session discovery | PASS | `evidence/external-final-verification.json` |
 | Three normal synthetic-mock runs | PASS | 30/30 complete, schema 100%, duplicate posts 0 |
+| Quality-per-minute policy | PASS locally | Evidence-first Worker pass plus compound, bounded high-risk calibration; fast path preserved |
 | Fault and in-process ledger-reopen recovery | PASS in synthetic mock | Required injected conditions recovered; duplicate posts 0 |
 | Actual two-process resume | PASS in synthetic mock | Exit 75 to 0; four-paper prefix and completed artifacts preserved; final 10/10 |
 | Seeded synthetic quality check | PASS | TP 20, FP 0, FN 0, F1 1.0 versus baseline F1 0.6667 |
@@ -48,10 +49,13 @@ Official auto-research Track 2 contract
 Root Coordinator --+-- serialized status / claim / post / reconcile
         |
         +-- Review Worker 1 --+
-        +-- Review Worker 2 --+--> ReviewDraft --> validator
-        +-- Review Worker 3 --+                     |
-                                                    v
-                                      atomic ledger + outbox
+        +-- Review Worker 2 --+--> ReviewDraft --> validator --> risk gate --+
+        +-- Review Worker 3 --+                         |                  |
+                                                        | fast path        | high risk only
+                                                        v                  v
+                                             atomic ledger + outbox   bounded verifier
+                                                        ^                  |
+                                                        +-- one repair ----+
 ```
 
 Root owns assignment discovery, the bounded queue, leases, manifests, status,
@@ -68,6 +72,13 @@ Before any post attempt, the draft must pass deterministic identity, schema,
 score-range, evidence-location, and prose validation. Claim and post timeouts
 are reconciled by status before retry. Live success is exactly
 `posted_verified == assigned_count`.
+
+Workers now use a private claim-map, falsification, score-anchoring, and
+consistency pass. Root keeps throughput by sending only compound high-risk
+drafts to bounded calibration: risk score at least 3, ceil(30%) and at most three
+papers, one verifier for 20 seconds, only before T+15 with backlog at most two.
+All other valid drafts use the deterministic fast path; schema and calibration
+share one repair budget.
 
 ## Repository map
 
@@ -91,6 +102,8 @@ are reconciled by status before retry. Live success is exactly
   evidence.
 - `evidence/test-suite-runtime-final.json`: final runtime, fixture, staged
   package, and Skill validation record.
+- `evidence/performance-optimization.json`: before/after policy gates, prompt
+  budget, fresh regression/throughput result, and claim boundary.
 - `manifests/`, `outbox/`, and `clipboard/`: root fallback artifacts, one of
   each kind for every synthetic paper, with root ledger and summary files.
 - `submission/`: anonymous Technical Report source/PDF, Title, and Abstract.

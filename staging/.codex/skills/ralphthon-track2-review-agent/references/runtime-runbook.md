@@ -31,6 +31,12 @@ For an actual two-process resume test, set `controlled_process_exit_after` to a 
 
 Resume with the same output directory and frozen inputs. Existing `posted_verified` papers are skipped. A manifest identity mismatch is a hard failure, not an overwrite. Paper IDs are used unchanged only when they are path-safe ASCII identifiers; separators, traversal, whitespace, and other unsafe characters are rejected before output paths are created.
 
+## Risk-gated review calibration
+
+After deterministic validation, Root scores review risk using the Skill rubric. The normal fast path goes directly to outbox/post. Only a score of at least 3 may enter the read-only verifier lane, capped at the smaller of three papers or the ceiling of 30% of assignments. Run at most one verifier for 20 seconds, with at most three findings, before T+15 and only while validated backlog is at most two. Never reduce the three active drafting slots while papers remain pending; reuse an idle Worker slot near the end of the queue. Fast/emergency mode, slow posting pace, prior repair, or an exhausted verifier budget bypasses calibration.
+
+Verifier PASS releases the unchanged draft. REPAIR names at most three exact fields and evidence locations. Root grants at most one targeted repair per paper across both schema and calibration paths, reruns the deterministic validator, and never calls the verifier twice. Verifier output is advisory and confers no ledger or platform authority.
+
 ## Live discovery and manual fallback
 
 At the authorized live start, spend at most 45 seconds observing assigned count, claim semantics, PDF access, form fields, and the success marker. Do not encode a selector or endpoint until observed. Platform priority is `reconcile/post > download > claim > browse`. Queue high-water is 3; increase only after confirming multiple claims are allowed.

@@ -14,16 +14,18 @@ status: synthetic-mock-verified-live-unverified
 - Agent name: `ralphthon-track2-review-agent`.
 - Runtime version: `ralphthon-track2-review-agent-v1`.
 - Official upstream dependency: `auto-research` at commit `a9f4f2583648ef4ca54f980f951ae393d153473f`.
-- Canonical frozen prompt SHA-256: `29e116b4b25663b65ff9920057a87d2b850080b97be836b364149cb95d9d914a`.
+- Canonical frozen task-prompt asset SHA-256: `29e116b4b25663b65ff9920057a87d2b850080b97be836b364149cb95d9d914a`.
 - Canonical frozen schema SHA-256: `cd19220f5435dc1da4146bd7c1e467cf4bea0ac0ecb69b2ac518b53922363d24`.
 - Frozen fixture manifest: `fixtures/FROZEN_MANIFEST.sha256`.
 - Staged package manifest: `staging/ralphthon-track2-review-agent.sha256`
-  with SHA-256 `daa71e174640dbc135f9a735bb4d42db99dba4e7abd7802b7aeb7866ac75c7f3`.
+  with SHA-256 `38f2c01d2d27d3f8451f97167a3fbec9b11bfa4723d1f8ca72e0484723a9d0f7`.
 
-The prompt and schema hashes above are the identities written into every
-per-paper manifest in the frozen synthetic-mock evidence. Before live use, Root
-must freeze and read back the actual paper, evidence, prompt, schema, and agent
-hashes for each assignment.
+The task-prompt asset and schema hashes above are written into every per-paper
+manifest in the frozen synthetic-mock evidence. The native developer policy is
+a separate surface frozen by the staged-package manifest above; Root verifies
+and records that wrapper-manifest SHA in batch metadata. Before live use, Root
+must also freeze and read back the actual paper, evidence, task-prompt asset,
+schema, and agent hashes for each assignment.
 
 ## Input contract
 
@@ -47,6 +49,11 @@ weakness, evidence-trace item, and score rationale to a page, section, table,
 figure, appendix, or saved result. If support is absent or ambiguous, state the
 limitation and lower confidence instead of inventing evidence, citations,
 experiments, intent, or consensus.
+
+Before emitting JSON, privately build a claim map, run a falsification pass,
+anchor each score independently, and check consistency across claims,
+rationales, scores, confidence, and comment. Prefer a few high-impact findings,
+and distinguish missing evidence from evidence that a claim is false.
 
 ## Output contract
 
@@ -72,7 +79,11 @@ read frozen inputs and return `ReviewDraft`. The queue high-water mark is three
 until the live interface confirms that multiple claims are permitted.
 
 Root writes `outbox/<paper_id>.json` and `clipboard/<paper_id>.txt` before any
-post attempt. One targeted schema repair is allowed. Claim and post timeouts
+post attempt. Deterministic validation remains mandatory. Root routes only a
+high-risk, schema-valid subset to read-only draft calibration: risk score at
+least 3, ceil(30%) and at most three papers, one verifier for 20 seconds, before T+15
+with backlog at most two. The fast path bypasses calibration. Schema and
+calibration share one targeted-repair budget per paper. Claim and post timeouts
 enter an unknown state and are reconciled by status before a retry. A verified
 post is never repeated. Live success is exactly
 `posted_verified == assigned_count`.

@@ -1,0 +1,65 @@
+{
+  "generated_at": "2026-07-12T15:24:21+09:00",
+  "evidence_kind": "local_prompt_policy_and_synthetic_mock_validation",
+  "objective": "Improve Track 2 review quality per minute while preserving three-worker throughput, schema safety, restart recovery, and zero live side effects before the authorized window.",
+  "baseline": {
+    "evaluator_passed": false,
+    "missing_checks": [
+      "worker_evidence_first_calibration",
+      "risk_gated_verifier_fast_path",
+      "verifier_supports_draft_calibration"
+    ],
+    "mock_elapsed_seconds": [
+      0.027437,
+      0.028424,
+      0.02544
+    ],
+    "regression_tests_run": 49,
+    "mock_posted_verified": "30/30",
+    "mock_schema_valid": "30/30",
+    "mock_duplicate_posts": 0,
+    "live_guard_before_writes": true
+  },
+  "final": {
+    "evaluator_passed": true,
+    "worker_native_instruction_bytes": 2224,
+    "worker_native_instruction_budget_bytes": 4096,
+    "worker_private_passes": [
+      "claim map",
+      "falsification pass",
+      "score anchoring",
+      "consistency pass"
+    ],
+    "risk_gate": {
+      "threshold": 3,
+      "maximum_papers": "min(3, ceil(assigned_count * 0.3))",
+      "maximum_concurrent_verifiers": 1,
+      "timeout_seconds": 20,
+      "maximum_findings": 3,
+      "latest_start": "T+15",
+      "maximum_validated_backlog": 2,
+      "fast_or_emergency_mode_bypasses": true,
+      "low_confidence_or_extreme_score_alone_is_not_sufficient": true,
+      "schema_and_calibration_share_one_repair_budget": true
+    },
+    "mock_elapsed_seconds": [
+      0.024593,
+      0.02576,
+      0.026688
+    ],
+    "regression_tests_run": 49,
+    "mock_posted_verified": "30/30",
+    "mock_schema_valid": "30/30",
+    "mock_duplicate_posts": 0,
+    "live_guard_before_writes": true,
+    "installed_matches_staging": true,
+    "wrapper_manifest_sha256": "38f2c01d2d27d3f8451f97167a3fbec9b11bfa4723d1f8ca72e0484723a9d0f7"
+  },
+  "unchanged_submission_artifacts": {
+    "technical_report_tex_sha256": "d8b17f65cb9f965214127869badf8ce64d4f4749d46607dedda69b46d503c2a0",
+    "technical_report_pdf_sha256": "b1a8c476f9bf0718d4a64c7192467fad588fe7a35f25380a9d363696548db18f",
+    "title_sha256": "23451a0afe573a7ca17e8de1e81c32a20fe7ff09ec6cfee017253fb888c9147e",
+    "abstract_sha256": "17cee83d5261050d9b4c5f3e9271f6b318109b252a83649dff8bb42eba7f30dd"
+  },
+  "claim_boundary": "The timing and completion results are deterministic synthetic-mock evidence. The prompt and risk-gate changes are policy-level quality controls; they do not prove review quality, human agreement, or live-platform latency on unseen papers. No production claim, post, browser action, or network side effect occurred."
+}
