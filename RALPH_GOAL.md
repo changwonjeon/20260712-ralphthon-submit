@@ -95,3 +95,5 @@ status: frozen-pending-user-start
 # Operator Boundary
 
 이 Goal과 launcher가 준비되어 있어도 사용자의 명시적인 시작 신호 전에는 실행하지 않는다. 실제 시작은 행사 진행에 맞춰 사용자가 지시한다.
+
+사용자 시작 신호 뒤 실행할 유일한 명령은 프로젝트 루트에서 `./work/start-ralph-loop.sh START-RALPH`다. bare `omx ralph`는 Goal, keep-awake, 고정 tmux session, deadline watcher를 함께 보장하지 않으므로 사용하지 않는다.

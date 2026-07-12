@@ -16,7 +16,7 @@ if [[ ! -s RALPH_GOAL.md ]]; then
   exit 3
 fi
 
-if ! git diff --quiet || ! git diff --cached --quiet; then
+if [[ -n "$(git status --porcelain)" ]]; then
   print -u2 "Working tree is not clean. Freeze and commit preflight artifacts first."
   exit 4
 fi
@@ -25,9 +25,16 @@ if ! tmux has-session -t ralphthon-awake 2>/dev/null; then
   tmux new-session -d -s ralphthon-awake "/usr/bin/caffeinate -dimsu -t 11400"
 fi
 
-if ! tmux has-session -t ralphthon-deadline 2>/dev/null; then
-  tmux new-session -d -s ralphthon-deadline "$ROOT/work/ralph-deadline-watchdog.sh"
-fi
+for session in ralphthon-loop ralphthon-deadline; do
+  if tmux has-session -t "$session" 2>/dev/null; then
+    print -u2 "$session already exists."
+    exit 5
+  fi
+done
 
-task_text="$(<RALPH_GOAL.md)"
-exec omx ralph --tmux --xhigh -a never -s workspace-write -C "$ROOT" "$task_text"
+tmux new-session -d -s ralphthon-loop -c "$ROOT" "$ROOT/work/run-ralph-direct.sh"
+tmux new-session -d -s ralphthon-deadline "$ROOT/work/ralph-deadline-watchdog.sh"
+
+print "Ralph started in tmux session: ralphthon-loop"
+print "Deadline watcher: ralphthon-deadline"
+print "Read-only inspection: tmux attach -t ralphthon-loop"
