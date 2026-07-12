@@ -3,7 +3,7 @@ type: Human Handoff
 title: Ralphthon Track 2 Build and Submission Handoff
 description: Acceptance status, frozen evidence, commands, limitations, live boundary, and human checks.
 tags: [ralphthon, track-2, handoff, submission]
-timestamp: 2026-07-12T14:46:40+09:00
+timestamp: 2026-07-12T16:03:16+09:00
 status: local-build-installed-discovered-live-unverified
 ---
 
@@ -51,7 +51,8 @@ single repair budget and has no platform or ledger authority.
 | Actual process interruption and fresh-process resume | PASS IN SYNTHETIC MOCK | `evidence/process-restart-proof/aggregate.json`; exit 75 to 0, final 10/10, prefix and prior artifacts preserved |
 | Process rerun idempotency | PASS IN SYNTHETIC MOCK | Ledger and outbox byte-identical after rerun |
 | Root manifests, outbox JSON, clipboard text, ledger, and summary | PASS IN SYNTHETIC MOCK | `manifests/`, `outbox/`, and `clipboard/` each contain 10 paper artifacts; root ledger and summary are present |
-| Technical Report source, PDF, Title, and Abstract | PASS | Offline Tectonic exit 0; 3 pages; body marker page 3; anonymous metadata/text/source scans, embedded-font checks, exact Title/Abstract match, raw-number check, and three-page visual QA passed |
+| English Technical Report source, PDF, Title, and Abstract | PASS | Tectonic exit 0; ICML Letter format, 4 pages; anonymous metadata/text/source scans, embedded-font checks, exact Title/Abstract match, raw-number check, and four-page visual QA passed |
+| Korean comprehension report source, PDF, Title, and Abstract | PASS | Tectonic exit 0; A4 single-column format, 6 pages; anonymous PDF metadata, embedded-font and text checks, and six-page visual QA passed; not an official submission artifact |
 | `review-agent.md` and root `README.md` | PASS | Final evidence identities, mock/live boundary, and install instructions are present |
 | New-session discovery for both Skills | PASS | `evidence/external-final-verification.json` |
 | Explicit native architect verification | PASS FOR ARCHITECTURE; ENVIRONMENT BLOCKER RESOLVED LATER | The preserved 14:00 snapshot is `evidence/architect-audit.md`; post-Ralph install/discovery resolution is recorded separately |
@@ -222,23 +223,33 @@ The normal Tectonic bundle path panicked twice before TeX in the host
 path succeeds and its exact output is retained in
 `evidence/report/tectonic-offline-success.log`.
 
-The final PDF audit is `evidence/report/report-validation.txt`. The PDF was
-built at 14:16:01 KST, and root repeated three-page visual QA at 14:20:57 KST.
+The historical three-page PDF audit is preserved at
+`evidence/report/report-validation.txt`. The current bilingual audit is
+`evidence/report/report-validation-final-bilingual.txt`; Root inspected all
+four English pages and all six Korean pages after their final builds.
 Final artifact SHA-256 values are:
 
 ```text
-d8b17f65cb9f965214127869badf8ce64d4f4749d46607dedda69b46d503c2a0  submission/technical-report.tex
-b1a8c476f9bf0718d4a64c7192467fad588fe7a35f25380a9d363696548db18f  submission/technical-report.pdf
+bec9154a3a4e0555e4e6871e8cbefe11a77d0a84906b29af791daabbd918bb84  submission/technical-report.tex
+250b0329cbebf86d840aaea1d704617137d48fa760778404bf0deaf1774c3a22  submission/technical-report.pdf
 23451a0afe573a7ca17e8de1e81c32a20fe7ff09ec6cfee017253fb888c9147e  submission/TITLE.txt
-17cee83d5261050d9b4c5f3e9271f6b318109b252a83649dff8bb42eba7f30dd  submission/ABSTRACT.txt
+b58f8104efaf209c07fd1013b3333d619a5d3fc259086eea15116a43b0811a77  submission/ABSTRACT.txt
+a1a29c7d43619c8b628083c02f5e0ce342037473c6480e785bb6b79313821daa  submission/technical-report_kr.tex
+d8a28fd6eafc5a56fe51db87cb3b79ec580fbf05b84b9f6fcf69962bdf954fbc  submission/technical-report_kr.pdf
+71bbdcd386cb261a2a53db8e568530b1cf990207d9341d1916933c044c36ae08  submission/TITLE_kr.txt
+0af33ee1700f27e7ff5a88dca3f30025e161e92b6799371d29862bcc5d76bfaf  submission/ABSTRACT_kr.txt
 ```
 
 ## Deliverables
 
-- Technical Report source: `submission/technical-report.tex`
-- Technical Report PDF: `submission/technical-report.pdf`
-- Title: `submission/TITLE.txt`
-- Abstract: `submission/ABSTRACT.txt`
+- Official English Technical Report source: `submission/technical-report.tex`
+- Official English Technical Report PDF: `submission/technical-report.pdf`
+- Official English Title: `submission/TITLE.txt`
+- Official English Abstract: `submission/ABSTRACT.txt`
+- Korean comprehension report source: `submission/technical-report_kr.tex`
+- Korean comprehension report PDF: `submission/technical-report_kr.pdf`
+- Korean companion Title: `submission/TITLE_kr.txt`
+- Korean companion Abstract: `submission/ABSTRACT_kr.txt`
 - Review Agent definition: `review-agent.md`
 - Project overview and reproduction commands: `README.md`
 - Manual live fallback: `MANUAL_PLATFORM.md`

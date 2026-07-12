@@ -1,46 +1,34 @@
 ---
 type: Project Overview
-title: Ralphthon Track 2 Review Agent
-description: Evidence-bound Track 2 review orchestration with frozen synthetic-mock recovery validation.
-tags: [ralphthon, track-2, review-agent, codex]
-timestamp: 2026-07-12T14:46:40+09:00
+title: Ralphthon Track 2 리뷰 에이전트
+description: 동결된 논문과 근거를 바탕으로 제한 시간 안에 ICML 형식 리뷰를 생성하는 증거 기반 Codex Skill과 분산 실행 구조.
+tags: [ralphthon, track-2, review-agent, codex, okf]
+timestamp: 2026-07-12T16:03:16+09:00
 status: build-installed-discovered-live-unverified
 ---
 
-# Ralphthon Track 2 Review Agent
+# Ralphthon Track 2 리뷰 에이전트
 
-This repository implements a Track 2-only Codex review workflow around the
-official `auto-research` Skill. It freezes each paper and evidence bundle before
-Worker execution, preserves the official Contribution field beside event
-Significance, Originality, and Comment, and gives all platform side effects to
-one Root coordinator.
+이 저장소는 주최측 공식 `auto-research` Skill의 Track 2-only frozen-paper 경로를 보존하면서, 배정된 논문을 제한 시간 안에 ICML 형식으로 리뷰하기 위한 Codex Skill과 실행 증적을 제공한다. 각 논문과 근거 묶음을 Worker 실행 전에 동결하고, 플랫폼 부작용은 하나의 Root Coordinator만 수행한다.
 
-The implementation is verified against deterministic synthetic fixtures and a
-mock platform. It has not claimed or posted a production paper, and it does not
-claim review quality on unseen research.
+현재 구현은 결정론적 synthetic fixture와 mock platform에서 검증되었다. 실제 OpenAgentReview 논문을 claim하거나 리뷰를 post한 적은 없으며, 보지 않은 논문에 대한 리뷰 품질이나 실제 플랫폼 처리 속도를 주장하지 않는다.
 
-## Status
+## 현재 상태
 
-| Surface | Status | Evidence |
+| 항목 | 상태 | 근거 |
 | --- | --- | --- |
-| Official `auto-research` subtree | PASS installed | Pinned commit, clean recursive diff, 11-file SHA-256 manifest |
-| Wrapper Skill and native agents | PASS installed and discovered | Both Skills visible; three typed native-role spawns completed |
-| Combined project-local package | PASS | 28/28 exact installer read-back matches |
-| Fresh Codex-session discovery | PASS | `evidence/external-final-verification.json` |
-| Three normal synthetic-mock runs | PASS | 30/30 complete, schema 100%, duplicate posts 0 |
-| Quality-per-minute policy | PASS locally | Evidence-first Worker pass plus compound, bounded high-risk calibration; fast path preserved |
-| Fault and in-process ledger-reopen recovery | PASS in synthetic mock | Required injected conditions recovered; duplicate posts 0 |
-| Actual two-process resume | PASS in synthetic mock | Exit 75 to 0; four-paper prefix and completed artifacts preserved; final 10/10 |
-| Seeded synthetic quality check | PASS | TP 20, FP 0, FN 0, F1 1.0 versus baseline F1 0.6667 |
-| Runtime and package regression | PASS | 49/49 tests; staged checks 28/28, 17/17, 11/11, and fixtures 16/16 |
-| Anonymous ICML report | PASS | Tectonic PDF, page/marker/metadata/font/text/visual checks |
-| Production adapter and live completion | NOT RUN | Requires authorized 16:35 KST discovery and observed UI contract |
+| 공식 `auto-research` Skill | PASS INSTALLED | upstream commit `a9f4f2583648ef4ca54f980f951ae393d153473f`, 11개 파일 manifest와 recursive diff 일치. |
+| Wrapper Skill과 native agents | PASS INSTALLED AND DISCOVERED | project-local `.codex` 설치와 fresh-session discovery 완료. |
+| 결합 패키지 | PASS | staging과 설치본 28/28 일치. |
+| 회귀검사와 성능 정책 evaluator | PASS LOCALLY | 회귀 49건과 `tests/performance_evaluator.py` 통과. |
+| 정상 synthetic mock | PASS IN MOCK | 10편을 3회 실행해 30/30 완료, schema 100%, 중복 post 0건. |
+| 실패 복구와 재시작 | PASS IN MOCK | malformed JSON, Worker·claim·post timeout, ledger reopen, 실제 2-process 재개 검증. |
+| Evidence-first 및 risk-gated calibration | PASS BY CONTRACT AND LOCAL EVALUATOR | 복합 risk score, 최대 30%·3편, verifier 1개·20초, repair 1회 계약. |
+| 영문 Technical Report | PASS LOCAL PDF | ICML 형식 4페이지, PDF metadata Author `Anonymous`, 글꼴·텍스트·전 페이지 렌더 검증 완료. |
+| 한국어 이해용 리포트 | PASS LOCAL PDF | 제출 양식과 분리한 A4 단일 열 6페이지 동반본, PDF metadata Author `Anonymous`, 글꼴·텍스트·전 페이지 렌더 검증 완료. |
+| Production adapter와 live 완료 | **NOT RUN** | 16:35 KST 이후 실제 UI 계약을 관찰해야 함. |
 
-Runtime and quality values come from
-`evidence/mock-validation-final-20260712T1335KST/aggregate.json`. The actual
-two-process values come from `evidence/process-restart-proof/aggregate.json`.
-
-## Architecture
+## 아키텍처
 
 ```text
 Official auto-research Track 2 contract
@@ -58,66 +46,39 @@ Root Coordinator --+-- serialized status / claim / post / reconcile
                                                         +-- one repair ----+
 ```
 
-Root owns assignment discovery, the bounded queue, leases, manifests, status,
-claim, post, receipts, outbox, and the atomic ledger. A Worker receives one
-frozen manifest and lease and returns one `ReviewDraft`. Workers have no
-platform or shared-state authority.
+Root는 assignment discovery, bounded queue, lease, manifest, status, claim, post, receipt, outbox와 atomic ledger를 소유한다. Worker 3개는 각각 동결된 manifest와 활성 lease 하나만 받아 `ReviewDraft`를 반환하며 플랫폼과 공유 상태를 변경할 권한이 없다.
 
-The manifest stores paper and evidence file identities as name, SHA-256, and
-size plus aggregate hashes; the frozen corpus supplies allowed paths, and Root
-issues the lease separately. Unsafe paper identifiers are rejected before any
-write. An identity mismatch blocks execution and cannot be schema-repaired.
+## 실행 계약
 
-Before any post attempt, the draft must pass deterministic identity, schema,
-score-range, evidence-location, and prose validation. Claim and post timeouts
-are reconciled by status before retry. Live success is exactly
-`posted_verified == assigned_count`.
+- 각 논문에 대해 paper, evidence, schema, prompt, agent version의 SHA-256을 동결한다.
+- `paper_id`, `lease_id`, `input_hash`, `evidence_hash`, `prompt_hash`, `agent_version` 불일치는 repair하지 않고 즉시 차단한다.
+- 공식 `contribution`과 행사 필드 `significance`, `originality`, `comment`를 독립적으로 보존하며 서로 환산하지 않는다.
+- deterministic validator가 identity, schema, 점수 범위, evidence location과 필수 문장을 먼저 검사한다.
+- schema repair와 calibration repair는 논문당 targeted repair 1회를 공유한다.
+- Worker는 내부적으로 claim map, falsification pass, score anchoring, consistency pass를 수행한 뒤 canonical JSON만 반환한다.
+- 낮은 confidence나 극단 recommendation 값만으로 verifier를 호출하지 않는다. 복합 risk score가 3 이상인 schema-valid draft만 calibration 후보가 된다.
+- Calibration은 `min(3, ceil(assigned_count * 0.3))`편, verifier 1개, 논문당 20초·finding 3개, T+15 이전, validated backlog 2 이하로 제한한다.
+- Pending draft가 있는 동안 Worker 3개를 verifier 때문에 줄이지 않는다. fast/emergency mode, 느린 posting pace, 기존 repair 사용 논문은 calibration을 우회한다.
+- Claim과 post timeout 뒤에는 재시도 전에 status를 확인하며, 성공 또는 reconciliation된 post를 반복하지 않는다.
+- 성공 조건은 `posted_verified == assigned_count`다.
 
-Workers now use a private claim-map, falsification, score-anchoring, and
-consistency pass. Root keeps throughput by sending only compound high-risk
-drafts to bounded calibration: risk score at least 3, ceil(30%) and at most three
-papers, one verifier for 20 seconds, only before T+15 with backlog at most two.
-All other valid drafts use the deterministic fast path; schema and calibration
-share one repair budget.
+## 저장소 구조
 
-## Repository map
+- `src/ralphthon_track2_review_agent/`에는 runtime, contract, manifest와 ledger 구현이 있다.
+- `.codex/skills/`와 `.codex/agents/`에는 설치된 두 Skill과 세 native agent 정의가 있다.
+- `staging/.codex/`에는 설치 기준이 되는 동결 패키지가 있다.
+- `fixtures/`에는 throughput 논문, seeded quality case, naive baseline과 frozen manifest가 있다.
+- `tests/`에는 contract, runtime, failure, restart, CLI, quality와 evidence consistency 검사가 있다.
+- `evidence/mock-validation-final-20260712T1335KST/`에는 기준 synthetic-mock 결과가 있다.
+- `evidence/process-restart-proof/`에는 실제 두 프로세스 중단·재개 증적이 있다.
+- `evidence/performance-optimization.json`에는 최신 calibration 정책과 evaluator 결과가 있다.
+- `manifests/`, `outbox/`, `clipboard/`, `ledger.jsonl`에는 mock 실행 및 manual fallback artifact가 있다.
+- `submission/`에는 제출용 영문 Technical Report와 이해용 한국어 동반본, 각 Title과 Abstract가 있다.
+- `review-agent.md`, `MANUAL_PLATFORM.md`, `HANDOFF.md`에는 agent 정의, live fallback과 운영 인계가 있다.
 
-- `src/ralphthon_track2_review_agent/`: runtime, contract, manifest, and ledger
-  code.
-- `.codex/skills/` and `.codex/agents/`: installed project-local Skills and
-  three native-agent definitions.
-- `staging/.codex/skills/auto-research/`: byte-identical pinned upstream Skill.
-- `staging/.codex/skills/ralphthon-track2-review-agent/`: wrapper Skill,
-  references, assets, and CLI validators.
-- `staging/.codex/agents/`: Review Worker, build verifier, and submission
-  auditor native-agent definitions.
-- `fixtures/`: frozen throughput papers, seeded quality cases, baseline, and
-  fixture manifest.
-- `tests/`: contract, runtime, failure, rerun, CLI, quality evaluation, and
-  evidence-consistency tests.
-- `evidence/mock-validation-final-20260712T1335KST/`: authoritative
-  synthetic-mock aggregate plus manifests, ledger, outbox, and clipboard
-  artifacts.
-- `evidence/process-restart-proof/`: actual two-process interruption/resume
-  evidence.
-- `evidence/test-suite-runtime-final.json`: final runtime, fixture, staged
-  package, and Skill validation record.
-- `evidence/performance-optimization.json`: before/after policy gates, prompt
-  budget, fresh regression/throughput result, and claim boundary.
-- `manifests/`, `outbox/`, and `clipboard/`: root fallback artifacts, one of
-  each kind for every synthetic paper, with root ledger and summary files.
-- `submission/`: anonymous Technical Report source/PDF, Title, and Abstract.
-- `review-agent.md`: frozen agent definition and invocation contract.
-- `MANUAL_PLATFORM.md`: selector-free live fallback.
-- `HANDOFF.md`: acceptance status, evidence, commands, limitations, and human
-  checks.
+## 설치 및 검증
 
-## Verify the installed package
-
-The immutable source package remains in `staging/.codex`, and the same 28 files
-are installed under project `.codex`. Static validation evidence is recorded
-in `evidence/discovery/staged-codex-validation.txt`; installation and fresh
-session evidence is recorded in `evidence/external-final-verification.json`.
+Staging 패키지와 공식 upstream을 검증한다.
 
 ```bash
 python3 scripts/install-track2-codex.py --check-staging
@@ -133,23 +94,23 @@ diff -qr \
   shasum -a 256 -c ralphthon-track2-review-agent.sha256)
 ```
 
-The installer is idempotent and verifies both Skills and all three native
-agents:
+Project-local `.codex`에 idempotent하게 설치하고 read-back한다.
 
 ```bash
 python3 scripts/install-track2-codex.py --install
 python3 scripts/install-track2-codex.py --check
 ```
 
-A fresh Codex session confirmed both `$auto-research` and
-`$ralphthon-track2-review-agent`; typed spawns also confirmed
-`track2-review-worker`, `track2-review-verifier`, and
-`track2-submission-auditor`. The official Skill must use its Track 2-only
-frozen-paper path.
+회귀검사와 최신 quality-per-minute 정책 evaluator를 실행한다.
 
-## Run and validate
+```bash
+python3 -m unittest discover -s tests -p 'test_*.py' -v
+python3 tests/performance_evaluator.py
+```
 
-Build manifests without platform actions:
+## BUILD와 DRY-RUN
+
+플랫폼 부작용 없이 manifest만 만든다.
 
 ```bash
 python3 staging/.codex/skills/ralphthon-track2-review-agent/scripts/run_batch.py \
@@ -159,7 +120,7 @@ python3 staging/.codex/skills/ralphthon-track2-review-agent/scripts/run_batch.py
   --output-dir /tmp/ralphthon-track2-build
 ```
 
-Run the deterministic mock adapter with three bounded Workers:
+Mock adapter와 bounded Worker 3개를 실행한다.
 
 ```bash
 python3 staging/.codex/skills/ralphthon-track2-review-agent/scripts/run_batch.py \
@@ -170,13 +131,7 @@ python3 staging/.codex/skills/ralphthon-track2-review-agent/scripts/run_batch.py
   --workers 3
 ```
 
-Run the regression suite:
-
-```bash
-python3 -m unittest discover -s tests -v
-```
-
-The evidence-producing command recorded in the frozen aggregate was:
+기준 evidence를 만든 명령은 다음과 같다. 기존 동결 디렉터리를 덮어쓰지 말고 재검증에는 다른 출력 경로를 사용한다.
 
 ```bash
 python3 tests/run_mock_evidence.py \
@@ -184,57 +139,87 @@ python3 tests/run_mock_evidence.py \
   --process-restart-evidence evidence/process-restart-proof/aggregate.json
 ```
 
-That directory is immutable evidence; use a different output directory for a
-recheck.
+## Skill 사용법
 
-## Results and claim boundary
-
-Across three deterministic 10-paper synthetic-mock repetitions, all 30
-assigned instances reached mock `posted_verified`, all 30 drafts passed schema
-validation, and duplicate post attempts and idempotency keys were zero. A
-separate 10-paper run recovered one malformed JSON output, worker timeout,
-claim timeout, and post timeout, and performed one in-process ledger reopen
-with 10/10 mock completion, 10/10 valid schemas, and no duplicates.
-
-In the actual two-process proof, the first process exited 75 after four
-mock-verified papers. A fresh process exited 0 at 10/10, with schema validity
-10/10 and no duplicates, while preserving the four-paper ledger prefix and
-completed manifest and outbox bytes. A no-op rerun after full completion also
-left the ledger and outbox byte-identical.
-
-On frozen seeded synthetic issues, the deterministic runtime recorded TP 20,
-FP 0, FN 0, and F1 1.0. The frozen naive baseline recorded TP 10, FP 0, FN 10,
-and F1 0.6667. This comparison measures recognition of intentionally seeded
-fixture issues, not scientific judgment, generalization, or live performance.
-The worker-timeout fault verifies mock-adapter `TimeoutError` recovery; it is
-not evidence that a running thread was forcibly killed.
-
-## Submission artifacts
-
-- `submission/technical-report.pdf`
-- `submission/technical-report.tex`
-- `submission/TITLE.txt`
-- `submission/ABSTRACT.txt`
-- `review-agent.md`
-- `HANDOFF.md`
-
-## Live operation
-
-At 16:35 KST, invoke `$ralphthon-track2-review-agent` in the fresh session with
-this instruction:
+새 Codex session에서 먼저 공식 Skill을 호출하고 Track 2-only frozen-paper 경로를 선택한다.
 
 ```text
-LIVE: perform at most 45 seconds of read-only LIVE_DISCOVERY, use only the observed platform contract, and switch to MANUAL_PLATFORM.md if automation is not verified.
+$auto-research
 ```
 
-The bundled CLI is BUILD/DRY-RUN-only and rejects `LIVE` unconditionally. At
-16:35 KST, use the Skill-guided read-only discovery and manual lane; no
-production adapter is implemented. Discovery must confirm the actual assignment
-count, claim semantics, PDF path, accepted fields, and posted-success marker.
-Platform priority is `reconcile/post > download > claim > browse`. Keep queue
-high-water at three unless multiple claims are explicitly allowed.
+그다음 wrapper Skill을 호출한다.
 
-If automation is unavailable, follow `MANUAL_PLATFORM.md`. Workers and the
-validator continue producing `outbox/<paper_id>.json` and
-`clipboard/<paper_id>.txt` while a human performs only the visible
-claim/download/post steps and verifies posted status.
+```text
+$ralphthon-track2-review-agent
+```
+
+로컬 shell CLI는 `BUILD`와 `DRY-RUN` 전용이며 `LIVE`를 항상 거부한다. 실제 live 작업은 Skill 실행 계약과 관찰된 UI만 사용한다.
+
+## 검증 결과와 주장 범위
+
+| 측정값 | Synthetic-mock 결과 |
+| --- | ---: |
+| 정상 반복 | 3회. |
+| 완료 및 schema-valid | 30/30, 100%. |
+| 중복 post attempt와 idempotency key | 0, 0. |
+| Fault run | 10/10 완료, schema 10/10, 중복 0. |
+| 실제 process resume | 첫 process exit 75·4편, 새 process exit 0·10/10. |
+| Seeded quality | TP 20, FP 0, FN 0, F1 1.0. |
+| Naive seeded baseline | TP 10, FP 0, FN 10, F1 0.6667. |
+
+기준 runtime·quality evidence는 `evidence/mock-validation-final-20260712T1335KST/aggregate.json`이며 SHA-256은 `239f2de62fcc5a1671b6cf86efc4f3a63077c3e3d2c81ccd2ad04e25a2077910`이다. Process-resume evidence는 `evidence/process-restart-proof/aggregate.json`이며 SHA-256은 `18d536ca72f87e03117af28d5534d10de1b316a3a0dc26b52fd5a2849e0de5d2`다. Wrapper manifest SHA-256은 `38f2c01d2d27d3f8451f97167a3fbec9b11bfa4723d1f8ca72e0484723a9d0f7`다.
+
+위 결과는 의도적으로 만든 문제를 포함한 결정론적 synthetic fixture에 대한 측정이다. 실제 논문의 과학적 리뷰 품질, 사람 평가자와의 일치, 일반화, 브라우저·네트워크 지연 또는 OpenAgentReview 완료를 입증하지 않는다. Worker-timeout fault는 mock adapter의 `TimeoutError` 복구를 검증하며 실행 중인 thread를 강제 종료했다는 증거가 아니다.
+
+## 영문 제출물과 한국어 이해용 동반본
+
+| 구분 | 제출용 영문 | 이해용 한국어 |
+| --- | --- | --- |
+| Technical Report PDF | `submission/technical-report.pdf` | `submission/technical-report_kr.pdf` |
+| Technical Report source | `submission/technical-report.tex` | `submission/technical-report_kr.tex` |
+| Title | `submission/TITLE.txt` | `submission/TITLE_kr.txt` |
+| Abstract | `submission/ABSTRACT.txt` | `submission/ABSTRACT_kr.txt` |
+
+공식 제출 기준은 영문 ICML 보고서다. `_kr` 파일은 사용자의 이해를 위한 한국어 동반본이며 ICML 페이지·단 구성 제약을 따르지 않는다. 공통 제출·운영 artifact는 `review-agent.md`, `HANDOFF.md`, `MANUAL_PLATFORM.md`다. 실제 업로드 직전에 영문 PDF, Title과 Abstract가 서로 일치하는지 확인하고 다음 명령으로 최종 해시를 새로 기록한다.
+
+```bash
+shasum -a 256 \
+  submission/technical-report.pdf \
+  submission/technical-report.tex \
+  submission/TITLE.txt \
+  submission/ABSTRACT.txt \
+  submission/technical-report_kr.pdf \
+  submission/technical-report_kr.tex \
+  submission/TITLE_kr.txt \
+  submission/ABSTRACT_kr.txt
+```
+
+검증된 영문 offline Tectonic 빌드 명령은 다음과 같다.
+
+```bash
+cd submission
+TECTONIC_CACHE_DIR=../tmp/pdfs/tectonic-work-cache \
+  tectonic -C -b ../tmp/pdfs/tectonic-cache.zip \
+  technical-report.tex --keep-logs --keep-intermediates
+```
+
+## 16:35 LIVE 운영과 manual fallback
+
+16:35 KST 이후 새 Codex session에서 다음과 같이 호출한다.
+
+```text
+$ralphthon-track2-review-agent LIVE: perform at most 45 seconds of read-only LIVE_DISCOVERY, use only the observed platform contract, and switch to MANUAL_PLATFORM.md if automation is not verified.
+```
+
+최대 45초 동안 read-only `LIVE_DISCOVERY`로 실제 assigned count, claim semantics, PDF 접근 경로, 허용 필드와 점수 범위, 복수 claim 허용 여부, posted-success marker를 확인한다. 관찰하지 않은 endpoint나 selector는 만들지 않는다.
+
+Automation이 검증되지 않으면 즉시 `MANUAL_PLATFORM.md`로 전환한다.
+
+1. 사람은 로그인된 UI에서 claim과 download를 수행한다.
+2. Root는 각 논문과 근거 manifest를 동결하고 read-back한다.
+3. Worker는 `ReviewDraft`만 반환한다.
+4. Root는 deterministic validation 후 outbox JSON과 clipboard text를 만든다.
+5. 사람은 UI가 실제로 받는 필드만 한 번 제출하고 posted 상태를 확인한다.
+6. Claim 또는 post 상태가 불명확하면 재시도 전에 UI status를 확인한다.
+
+Platform 우선순위는 `reconcile/post > download > claim > browse`다. Queue high-water는 3으로 시작하며 복수 claim이 허용된 사실을 확인한 뒤에만 높인다. 현재 production adapter와 live 완료 상태는 **NOT RUN**이다.

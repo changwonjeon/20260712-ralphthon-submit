@@ -1,0 +1,66 @@
+Ralphthon Track 2 bilingual report final validation
+Timestamp: 2026-07-12T16:03:16+09:00
+
+Artifact roles
+- submission/technical-report.pdf: official English submission artifact.
+- submission/technical-report_kr.pdf: Korean comprehension companion; not an official submission artifact.
+
+English PDF
+- Build: Tectonic exit 0.
+- Format: Letter, 612 x 792 pt.
+- Pages: 4, within the event's four-page limit.
+- Metadata Author: Anonymous.
+- Fonts: all reported fonts embedded and subset.
+- Log scan: no Overfull, LaTeX Error, Emergency stop, Fatal error, or Undefined control sequence.
+- Visual QA: all four final pages inspected after the final build; no clipping, overlap, blank page, or unreadable command block.
+- Title: PDF metadata and submission/TITLE.txt match after whitespace normalization.
+- Abstract: TeX abstract and submission/ABSTRACT.txt match exactly after TeX percent unescaping and whitespace normalization.
+
+Korean companion PDF
+- Build: Tectonic exit 0.
+- Format: A4, 595.28 x 841.89 pt, single column.
+- Pages: 6.
+- Metadata Author: Anonymous.
+- Fonts: all reported fonts embedded and subset; pdftotext extracts Korean text.
+- Log scan: no Overfull, LaTeX Error, Emergency stop, Fatal error, or Undefined control sequence.
+- Visual QA: all six final pages inspected after the final build; Korean spacing, figure/table placement, commands, references, and page boundaries are legible with no clipping, overlap, or blank page.
+- Title: PDF metadata and submission/TITLE_kr.txt match after whitespace normalization.
+- Abstract: TeX abstract and submission/ABSTRACT_kr.txt match exactly after TeX percent unescaping and whitespace normalization.
+
+Anonymity and claim boundary
+- PDF metadata uses Author Anonymous for both reports.
+- Extracted text and report sources contain no redux80, changwon, Jeon, user home path, or personal email address.
+- TeX-only @ matches are internal control-sequence names such as input@path and icml@noticeprintedtrue.
+- Both reports explicitly distinguish deterministic synthetic-mock evidence from LLM review quality, human agreement, live-platform throughput, and production claim/post success.
+
+Repository verification
+- unittest discovery: 49 tests run, 49 passed.
+- performance evaluator: passed=true, failed=[].
+- staged installer check: staging-valid, 28 files.
+- installed package check: installed, 28/28 match.
+- wrapper manifest: all entries OK.
+- official auto-research manifest: all entries OK.
+- CHECKPOINT.json parses successfully.
+- git diff --check: PASS.
+
+Final artifact SHA-256
+- bec9154a3a4e0555e4e6871e8cbefe11a77d0a84906b29af791daabbd918bb84  submission/technical-report.tex
+- 250b0329cbebf86d840aaea1d704617137d48fa760778404bf0deaf1774c3a22  submission/technical-report.pdf
+- 23451a0afe573a7ca17e8de1e81c32a20fe7ff09ec6cfee017253fb888c9147e  submission/TITLE.txt
+- b58f8104efaf209c07fd1013b3333d619a5d3fc259086eea15116a43b0811a77  submission/ABSTRACT.txt
+- a1a29c7d43619c8b628083c02f5e0ce342037473c6480e785bb6b79313821daa  submission/technical-report_kr.tex
+- d8a28fd6eafc5a56fe51db87cb3b79ec580fbf05b84b9f6fcf69962bdf954fbc  submission/technical-report_kr.pdf
+- 71bbdcd386cb261a2a53db8e568530b1cf990207d9341d1916933c044c36ae08  submission/TITLE_kr.txt
+- 0af33ee1700f27e7ff5a88dca3f30025e161e92b6799371d29862bcc5d76bfaf  submission/ABSTRACT_kr.txt
+
+Final rendered-page SHA-256
+- 97b80d611dcd73c793f182141c3ae8e15c72065affdbf79b949cd07b28b39770  evidence/report/technical-report-final-page-1.png
+- 597e619e37ccf6d992219a37ab31efb102f5af2cd3f2ea25a23a97df6dcccbc0  evidence/report/technical-report-final-page-2.png
+- e46d33e423f410446083ab675e5da990edeaa9f5d2cf4e1c83e27a32635d9eb6  evidence/report/technical-report-final-page-3.png
+- 6d42f12c7cbfb7b473b4146a763195539b8367f46ef9558ac30546ac73e5f471  evidence/report/technical-report-final-page-4.png
+- cfabf053225e6d89d23288041c78e1f3507e14286f484318ce9c79d230c17d05  evidence/report/technical-report-kr-final-page-1.png
+- c5ee19a6af7b019c6020cd901ccc4d4152c3cff9b4829cdc9310ff5c4f297f1e  evidence/report/technical-report-kr-final-page-2.png
+- b8ac596139f96acce9a5a6aa9e9c55e38b253b5f8b3b5914596d3c1e26e28e2a  evidence/report/technical-report-kr-final-page-3.png
+- 128f3bd64556e9d7a1dba4ac4a8767249e838236a76d170a3e10d15d119e553d  evidence/report/technical-report-kr-final-page-4.png
+- 42119b62e6adcb1b55e277beec88c39fc8cf63378ea42f0e8ec5cf885927ab60  evidence/report/technical-report-kr-final-page-5.png
+- fe5693fb4451aecd8bd0d73e2068eb89958fec35d30bf356efa7861f2209cd4a  evidence/report/technical-report-kr-final-page-6.png
