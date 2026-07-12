@@ -1,0 +1,137 @@
+{
+  "review_draft_version": "1.0",
+  "paper_id": "2607.08256v1",
+  "lease_id": "offline-trial-2607.08256v1-1",
+  "summary": "The paper studies a confound in Best-of-N zero-shot TTS evaluation: the apparent quality of an ASR verifier changes with the ASR evaluator used to compute WER. On a shared pool of F5-TTS candidates for 1,127 LibriSpeech-PC test-clean samples, it reports a verifier-order reversal between Whisper and wav2vec 2.0 evaluators, proposes two cross-family rank ensembles, and uses a small CKA pilot to explore whether encoder representation similarity explains evaluator agreement.",
+  "strengths": [
+    {
+      "claim": "The shared-candidate, uniform-normalization design isolates evaluator dependence more cleanly than comparisons across separate synthesis runs.",
+      "location": "Section 3, Data & normalization (page 2); Table 2 (page 2)"
+    },
+    {
+      "claim": "The narrow verifier-order reversal is concrete: fwhisper-lgv3 prefers distil-v3 over w2v2-base, while w2v2-lv60 prefers w2v2-base over distil-v3 on the displayed point estimates.",
+      "location": "Table 2 and Section 4.2 (page 2)"
+    },
+    {
+      "claim": "Rank-average and max-rank are simple, training-free ensemble rules and attain competitive three-evaluator mean WER in the reported candidate pool.",
+      "location": "Section 4.4, Figure 1, and Table 4 (page 3)"
+    },
+    {
+      "claim": "The authors disclose the single-backbone, single-corpus, automatic-quality-metric scope and leave identity-versus-family coupling unresolved.",
+      "location": "Section 5 and Limitations in Section 6 (page 4)"
+    }
+  ],
+  "weaknesses": [
+    {
+      "claim": "The headline claim that same-family pairs recover 2-3x more oracle headroom is not supported consistently: the displayed ratios are 3.29x for fwhisper-lgv3 and 1.43x for w2v2-lv60, while hubert-lg has no same-family verifier and gives a 27.1%-27.1% tie between the two leading verifiers.",
+      "location": "Abstract (page 1); Table 3 and Section 4.3 (page 3)"
+    },
+    {
+      "claim": "The central verifier-ranking interaction is not directly tested: Table 2 gives point estimates, and Table 4 tests methods only against the F5-TTS baseline under fwhisper-lgv3 rather than comparing verifiers within each evaluator with multiplicity control.",
+      "location": "Table 2 (page 2); Table 4 and Section 4.4 (page 3)"
+    },
+    {
+      "claim": "The paper announces four evaluators including distil-sm, but the full-data result tables report only three; omitting the exact-identity evaluator weakens the identity-or-lineage explanation.",
+      "location": "Introduction and Section 3, Evaluators (pages 1-2); Tables 2-4 (pages 2-3)"
+    },
+    {
+      "claim": "For apparently identical N=3 w2v2-base and distil-v3 WER rows, Table 1 reports p=0.31 and p=0.030 whereas Table 4 reports p=0.05 and p<0.001, with no explanation for the conflicting significance values.",
+      "location": "Table 1 (page 2); Table 4 (page 3)"
+    },
+    {
+      "claim": "The abstract's N=10 no-quality-degradation claim is not supported by per-configuration N=10 quality results or equivalence tests; Section 5.1 reports only N=3 automatic metrics and notes possible saturation.",
+      "location": "Abstract (page 1); Section 5.1 (page 4)"
+    },
+    {
+      "claim": "The six-point CKA pilot is too small to rule out representation similarity as a dominant contributor: the correlation changes sign when one point is removed and no uncertainty is reported.",
+      "location": "Table 5, Figure 2, and Section 5 (page 4)"
+    }
+  ],
+  "questions": [
+    "Can the authors report paired confidence intervals or tests for every direct verifier comparison under every evaluator, plus a verifier-by-evaluator interaction test with multiplicity handling?",
+    "Where are the full 1,127-sample distil-sm evaluator results promised in Section 3, and how do exact-checkpoint identity, independent same-family lineage, and cross-family cases differ?",
+    "Why do Table 1 and Table 4 give different p-values for rows with the same displayed N=3 WER values?",
+    "Were SIM-o and UTMOS computed for every N=5 and N=10 ensemble selection, and can the paper provide paired uncertainty or equivalence bounds and human or additional objective quality metrics?",
+    "Were the ensemble rules and N selected before inspecting this test set, and do the findings persist across candidate-generation seeds, another corpus, and another TTS backbone?"
+  ],
+  "soundness": 2,
+  "presentation": 3,
+  "contribution": 3,
+  "significance": 3,
+  "originality": 3,
+  "overall_recommendation": 3,
+  "confidence": 4,
+  "comment": "The controlled evaluator-dependence observation is useful, but the paper should narrow the abstract to that defensible result, disclose the fourth evaluator, reconcile the conflicting p-values, directly test verifier-by-evaluator interactions, report N=5/N=10 quality uncertainty, and present the CKA analysis as a pilot rather than a mechanism exclusion.",
+  "ethics_and_limitations": "No direct ethics violation is established. However, lower aggregate WER on LibriSpeech-PC test-clean does not establish demographic or accent fairness, and a cross-family ensemble can still mask subgroup failures. The empirical scope is one TTS backbone, one English clean-speech subset, three fully reported evaluator columns, one shared candidate pool without seed robustness, automatic quality metrics near saturation, and no human listening study.",
+  "evidence_trace": [
+    {
+      "claim": "The same generated candidates are evaluated across ASR families with uniform text normalization.",
+      "location": "Section 3, Data & normalization (page 2)"
+    },
+    {
+      "claim": "The displayed ranking reverses between fwhisper-lgv3 and w2v2-lv60.",
+      "location": "Table 2 and Section 4.2 (page 2)"
+    },
+    {
+      "claim": "The oracle-recovery ratios are 26.0/7.9=3.29 and 26.1/18.2=1.43, not uniformly 2-3x.",
+      "location": "Table 3 (page 3)"
+    },
+    {
+      "claim": "Table 1 and Table 4 assign incompatible p-values to rows with the same displayed WER values.",
+      "location": "Table 1 (page 2); Table 4 (page 3)"
+    },
+    {
+      "claim": "Section 3 specifies four evaluators, but the main cross-evaluator result tables contain three evaluator columns.",
+      "location": "Section 3 (page 2); Tables 2-4 (pages 2-3)"
+    },
+    {
+      "claim": "The N=10 ensemble means recompute to 1.6067%, consistent with the rounded 1.61% claim.",
+      "location": "Table 4 (page 3)"
+    },
+    {
+      "claim": "Quality preservation is quantified only at N=3 with automatic predictors that may be near saturation.",
+      "location": "Section 5.1 (page 4)"
+    },
+    {
+      "claim": "The CKA conclusion is based on six evaluator-pair points, and the reported trend changes sign after removing one point.",
+      "location": "Figure 2 and Section 5 (page 4)"
+    }
+  ],
+  "score_rationales": {
+    "soundness": {
+      "claim": "The controlled candidate pool supports evaluator dependence, but the headline generalization, direct interaction statistics, p-value consistency, fourth evaluator reporting, and mechanism evidence are inadequate.",
+      "location": "Sections 3-5 and Tables 1-5 (pages 2-4)"
+    },
+    "presentation": {
+      "claim": "The paper is compact and readable, but the four-versus-three evaluator mismatch, conflicting p-values, and N=3-versus-N=10 quality wording impede auditability.",
+      "location": "Sections 3-5 and Tables 1-4 (pages 2-4)"
+    },
+    "contribution": {
+      "claim": "The evaluator-dependence diagnosis and simple rank ensembles are useful, although the evidence supports a narrower contribution than advertised.",
+      "location": "Table 2 (page 2); Section 4.4 and Table 4 (page 3)"
+    },
+    "significance": {
+      "claim": "Cross-evaluator triangulation could improve TTS reporting practice, but its present validation is limited to one backbone and clean English corpus.",
+      "location": "Section 6 and Limitations (page 4)"
+    },
+    "originality": {
+      "claim": "The paper presents ASR-family-dependent BoN evaluation and cross-family selection ensembles as an underexplored TTS evaluation problem; novelty is judged only against the supplied paper and references.",
+      "location": "Introduction and contributions (page 1); Related Work (page 2)"
+    },
+    "overall_recommendation": {
+      "claim": "The narrow observation has merit, but the overgeneralized family claim, missing direct tests, inconsistent p-values, and incomplete quality evidence require substantial revision before the result is reliably buildable.",
+      "location": "Tables 1-5 and Sections 4-6 (pages 2-4)"
+    },
+    "confidence": {
+      "claim": "All six pages, tables, and figures were inspected and key arithmetic was recomputed, but raw audio, per-utterance outputs, code execution, and external novelty checking were outside this offline trial.",
+      "location": "Pages 1-6; saved result in verification/2607.08256v1.verifier.md"
+    }
+  },
+  "worker_id": "review-worker-B-independent",
+  "agent_version": "ralphthon-track2-real-trial-v1",
+  "prompt_hash": "29e116b4b25663b65ff9920057a87d2b850080b97be836b364149cb95d9d914a",
+  "input_hash": "5834ea20e1d76535daab79bc1680f6e1016f7198dc434f3aa26a9ccbf96e6cb1",
+  "evidence_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "started_at": "2026-07-12T07:35:00Z",
+  "completed_at": "2026-07-12T07:39:25Z"
+}

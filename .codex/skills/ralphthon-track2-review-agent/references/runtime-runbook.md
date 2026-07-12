@@ -35,7 +35,28 @@ Resume with the same output directory and frozen inputs. Existing `posted_verifi
 
 After deterministic validation, Root scores review risk using the Skill rubric. The normal fast path goes directly to outbox/post. Only a score of at least 3 may enter the read-only verifier lane, capped at the smaller of three papers or the ceiling of 30% of assignments. Run at most one verifier for 20 seconds, with at most three findings, before T+15 and only while validated backlog is at most two. Never reduce the three active drafting slots while papers remain pending; reuse an idle Worker slot near the end of the queue. Fast/emergency mode, slow posting pace, prior repair, or an exhausted verifier budget bypasses calibration.
 
-Verifier PASS releases the unchanged draft. REPAIR names at most three exact fields and evidence locations. Root grants at most one targeted repair per paper across both schema and calibration paths, reruns the deterministic validator, and never calls the verifier twice. Verifier output is advisory and confers no ledger or platform authority.
+Treat the Python and native paths as separate execution surfaces:
+
+- In `DRY-RUN`, explicitly enable the deterministic mock verifier to exercise the executable policy, gate, repair, revalidation, ledger, and summary branches. This adapter is synthetic test infrastructure and neither starts nor substitutes for the native `track2-review-verifier` role.
+- In a native Codex session, Root invokes the read-only `track2-review-verifier` role with one frozen paper, manifest, active lease, and deterministically valid ReviewDraft. Root does not shell out from the Python runtime to simulate native-agent independence.
+
+Exercise the Python branch with an explicit risk sidecar. Risk signals are inputs established by Root or a Worker; the runtime never pretends to infer semantic paper conflict from review prose.
+
+```bash
+python3 .codex/skills/ralphthon-track2-review-agent/scripts/run_batch.py \
+  --mode DRY-RUN --papers fixtures/throughput/papers.json \
+  --root-dir . --output-dir evidence/calibration-dry-run --workers 3 \
+  --calibration mock \
+  --calibration-plan fixtures/calibration/high-risk-pass.json
+```
+
+The plan is a JSON object with optional `risk_signals`, `verifier_results`, `gate`, and `repair_values` objects. `risk_signals` maps assigned paper IDs to the five boolean rubric signals. `verifier_results` maps paper IDs to strict PASS/REPAIR objects or the deterministic test tokens `timeout`, `failure`, and `malformed`. `gate` may override elapsed time, validated backlog, posting pace, and pending-draft state for boundary tests. `repair_values` supplies exact JSON Pointer replacements for synthetic REPAIR tests. The CLI keeps calibration off by default and rejects mock calibration in BUILD or LIVE.
+
+Validate both mock and native responses against `assets/verifier-result.schema.json`. PASS requires no findings and releases the byte-for-byte unchanged draft. REPAIR requires one to three findings; each finding names an allowed mutable field with an exact JSON Pointer-style path, explains the problem, cites a paper location, and gives a field-scoped instruction. Reject responses that rewrite the review, target identity or provenance, add unknown keys, or violate the PASS/REPAIR cardinality.
+
+Invoke the verifier at most once per paper. On verifier timeout, runtime error, or malformed output, append the failure outcome to the ledger, release the unchanged deterministically valid draft, and do not retry. This fail-open rule applies only to the advisory verifier; deterministic ReviewDraft validation and identity checks remain fail-closed.
+
+Grant at most one targeted repair per paper across both schema and calibration paths. A schema repair consumes the budget and bypasses calibration. For REPAIR, request only the named fields once, rerun the deterministic validator against the frozen manifest and active lease, and never call the verifier again. If the repaired draft is invalid or changes identity/provenance, fail that paper and do not post it. Verifier output confers no ledger or platform authority.
 
 ## Live discovery and manual fallback
 

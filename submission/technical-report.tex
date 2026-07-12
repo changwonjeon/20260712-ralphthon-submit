@@ -44,7 +44,9 @@ identities, confines platform side effects to one Root coordinator, and is
 designed to use up to three paper-local Review Workers. Each Worker applies a
 private claim-map, falsification, score-anchoring, and consistency pass;
 deterministic validation precedes an optional, bounded verifier lane for
-compound high-risk drafts. On three 10-paper deterministic synthetic-mock
+compound high-risk drafts. An explicit risk sidecar and mock verifier execute
+that branch locally; native verification remains separately orchestrated. On
+three 10-paper deterministic synthetic-mock
 runs, all 30 drafts reached mock verified completion with 100\% schema validity
 and no duplicate post attempts or idempotency keys. A fault run recovered one
 malformed output, Worker timeout, claim timeout, and post timeout, and a
@@ -142,8 +144,9 @@ validation, Root may route only a compound high-risk subset to one read-only
 verifier. The policy caps this lane at
 $\min(3,\lceil 0.3N\rceil)$ papers, 20 seconds per paper, before T+15 and only
 while validated backlog is at most two. Normal drafts use the fast path. These
-are execution-policy controls; they have not been evaluated as a review-quality
-improvement on unseen papers.
+state transitions execute in DRY-RUN through an explicit risk sidecar and
+deterministic mock verifier; native verification remains a separate Root-owned
+Codex action. This validates control flow, not unseen-paper quality improvement.
 
 \section{Operational Use}
 
@@ -156,8 +159,9 @@ dispatches paper-local drafting, runs deterministic validation and the bounded
 risk gate, and writes outbox and clipboard artifacts before any post attempt.
 
 The bundled \texttt{run\_batch.py} supports \texttt{BUILD} for manifest
-freezing and mock-only \texttt{DRY-RUN} for local recovery checks; it rejects
-\texttt{LIVE} before creating output. At the authorized live start, the Skill
+freezing and mock-only \texttt{DRY-RUN}; explicit \texttt{--calibration mock}
+plus a sidecar exercises verifier gates and repair. It rejects \texttt{LIVE}
+before creating output. At the authorized live start, the Skill
 allows at most 45 seconds of read-only contract discovery. If assignment,
 field, or success-marker semantics cannot be verified, operation switches to
 the selector-free manual fallback while the same validation and status-first
@@ -284,9 +288,10 @@ The actual process result comes from
 \nolinkurl{evidence/process-restart-proof/aggregate.json}. Values above are
 direct aggregates or four-decimal rounding of their stored values.
 
-A post-build policy evaluator additionally passed all 49 regression tests,
-confirmed exact installed/staged package equality, and repeated the normal
-synthetic-mock batch at 30/30 valid, duplicate-free completion. The native
+A post-build evaluator additionally passed all 70 regression tests, confirmed
+exact installed/staged package equality, executed the bounded calibration
+branch, and repeated the normal synthetic-mock batch at 30/30 valid,
+duplicate-free completion. The native
 Worker instruction surface is 2,224 bytes under a 4,096-byte budget. This
 validates packaging and fast-path preservation, not the scientific effect of
 calibration.
@@ -328,8 +333,10 @@ is limited to the submitted paper and its supplied references. A deterministic
 schema validator can reject malformed reviews but cannot certify scientific
 quality. The live adapter remains unspecified until read-only discovery reveals
 the actual platform contract; no endpoint or selector is assumed here.
-The evidence-first and verifier policies are prompt and orchestration contracts;
-their effect on unseen-paper quality and inter-reviewer agreement is unmeasured.
+The mock verifier executes risk, gate, PASS/REPAIR, shared-repair, revalidation,
+and audit transitions but is not an independent scientific judge. Native
+verification remains Root-orchestrated; its effect on unseen-paper quality and
+inter-reviewer agreement is unmeasured.
 
 \newpage
 \section{Conclusion}

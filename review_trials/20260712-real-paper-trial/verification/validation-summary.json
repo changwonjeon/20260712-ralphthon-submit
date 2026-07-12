@@ -1,0 +1,37 @@
+{
+  "trial_id": "20260712-real-paper-trial",
+  "platform_side_effects": false,
+  "reviews": [
+    {
+      "paper_id": "2607.08173v1",
+      "manifest_valid": true,
+      "schema_errors": [],
+      "verifier_verdict": "PASS",
+      "repairs": 0,
+      "final_review_sha256": "797af6a6c54dd913b29f626049f264c5aadb6b9ba4575949a7fa25a65baba460"
+    },
+    {
+      "paper_id": "2607.08256v1",
+      "manifest_valid": true,
+      "schema_errors": [],
+      "verifier_verdict": "PASS",
+      "repairs": 0,
+      "final_review_sha256": "f80c4240d4c21ffde2dabf3d7016cd0fbade18709e622ee026cda7caf2cca21a"
+    }
+  ],
+  "fresh_native_verifier_acceptance": {
+    "paper_id": "2607.08173v1",
+    "role": "read-only draft-calibration verifier",
+    "result_path": "verification/2607.08173v1.native-verifier-result.json",
+    "verdict": "PASS",
+    "findings": 0,
+    "platform_side_effects": false
+  },
+  "scope_limits": [
+    "two-paper qualitative trial",
+    "no gold review or author rebuttal",
+    "no raw experiment or code execution",
+    "no external novelty search",
+    "native verifier was directly orchestrated; Python runtime integration uses an explicit deterministic mock adapter only"
+  ]
+}

@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-07-12T15:24:21+09:00",
-  "evidence_kind": "local_prompt_policy_and_synthetic_mock_validation",
-  "objective": "Improve Track 2 review quality per minute while preserving three-worker throughput, schema safety, restart recovery, and zero live side effects before the authorized window.",
+  "generated_at": "2026-07-12T17:32:42+09:00",
+  "evidence_kind": "executable_calibration_runtime_and_bounded_review_validation",
+  "objective": "Improve Track 2 review quality per minute while preserving three-worker throughput, schema safety, restart recovery, Root-owned posting, and zero live side effects before an authorized window.",
   "baseline": {
     "evaluator_passed": false,
     "missing_checks": [
@@ -22,14 +22,20 @@
   },
   "final": {
     "evaluator_passed": true,
-    "worker_native_instruction_bytes": 2224,
-    "worker_native_instruction_budget_bytes": 4096,
-    "worker_private_passes": [
-      "claim map",
-      "falsification pass",
-      "score anchoring",
-      "consistency pass"
+    "regression_tests_run": 70,
+    "mock_elapsed_seconds": [
+      0.02594,
+      0.030727,
+      0.02867
     ],
+    "mock_posted_verified": "30/30",
+    "mock_schema_valid": "30/30",
+    "mock_duplicate_posts": 0,
+    "live_guard_before_writes": true,
+    "installed_matches_staging": true,
+    "calibration_runtime_executed": true,
+    "calibration_adapter": "mock",
+    "risk_signal_source": "explicit sidecar fixture",
     "risk_gate": {
       "threshold": 3,
       "maximum_papers": "min(3, ceil(assigned_count * 0.3))",
@@ -42,24 +48,48 @@
       "low_confidence_or_extreme_score_alone_is_not_sufficient": true,
       "schema_and_calibration_share_one_repair_budget": true
     },
-    "mock_elapsed_seconds": [
-      0.024593,
-      0.02576,
-      0.026688
+    "runtime_acceptance": {
+      "risk_scored": "10/10",
+      "verifier_selected": "between 1 and 3",
+      "verifier_cap": 3,
+      "verifier_max_active": 1,
+      "selected_verdicts": "PASS",
+      "posted_verified": "10/10"
+    },
+    "integration_coverage": [
+      "PASS preserves the original draft",
+      "REPAIR permits one field-scoped repair and deterministic revalidation",
+      "timeout, adapter failure, and malformed output fail open without retry",
+      "schema and calibration repairs share a one-attempt budget",
+      "resume never invokes the verifier twice for the same paper",
+      "Root retains ledger, outbox, and posting authority"
     ],
-    "regression_tests_run": 49,
-    "mock_posted_verified": "30/30",
-    "mock_schema_valid": "30/30",
-    "mock_duplicate_posts": 0,
-    "live_guard_before_writes": true,
-    "installed_matches_staging": true,
-    "wrapper_manifest_sha256": "38f2c01d2d27d3f8451f97167a3fbec9b11bfa4723d1f8ca72e0484723a9d0f7"
+    "wrapper_manifest_sha256": "b9fc57b4755c00d273a999be3c7900d2fc7d85c1c897f8fd91a6e8149bc3eaba"
   },
-  "unchanged_submission_artifacts": {
-    "technical_report_tex_sha256": "d8b17f65cb9f965214127869badf8ce64d4f4749d46607dedda69b46d503c2a0",
-    "technical_report_pdf_sha256": "b1a8c476f9bf0718d4a64c7192467fad588fe7a35f25380a9d363696548db18f",
+  "qualitative_real_paper_trial": {
+    "papers": 2,
+    "schema_and_manifest_valid": "2/2",
+    "verifier_pass": "2/2",
+    "repairs": 0,
+    "platform_side_effects": false,
+    "summary_path": "review_trials/20260712-real-paper-trial/verification/validation-summary.json",
+    "fresh_native_verifier_acceptance": {
+      "paper_id": "2607.08173v1",
+      "result_path": "review_trials/20260712-real-paper-trial/verification/2607.08173v1.native-verifier-result.json",
+      "sha256": "a8e84d713306e22fd9c7a82329b5a7bd057494acd643db01080a76d29f28288b",
+      "verdict": "PASS",
+      "findings": 0
+    }
+  },
+  "submission_artifacts": {
+    "technical_report_tex_sha256": "5a4227d988107c2673c8dff4509ef8ac8b719be53e4bc5c061bcc740518627bc",
+    "technical_report_pdf_sha256": "66d8d96c8b2cd4b054241e05d5458f4aa8ab4a83ffe56fff36d11811d35467dc",
     "title_sha256": "23451a0afe573a7ca17e8de1e81c32a20fe7ff09ec6cfee017253fb888c9147e",
-    "abstract_sha256": "17cee83d5261050d9b4c5f3e9271f6b318109b252a83649dff8bb42eba7f30dd"
+    "abstract_sha256": "16b52aaa453fbb0a2df2b4895d597fc79661b0f4d0faef724453da3a76daec95",
+    "technical_report_kr_tex_sha256": "69048ed093615aa37123005dcf4288b3f8b59ae88073d664bb015bd0a1f6f255",
+    "technical_report_kr_pdf_sha256": "1ee2c4d024e1ce4c60e29c6748cc4005e72d9401e27be64f8dfa540630b4f3ba",
+    "title_kr_sha256": "71bbdcd386cb261a2a53db8e568530b1cf990207d9341d1916933c044c36ae08",
+    "abstract_kr_sha256": "73cefb07389a0015f5375fdd2b47d92a0666ff291f87c39e1602c301ed4cfa4e"
   },
-  "claim_boundary": "The timing and completion results are deterministic synthetic-mock evidence. The prompt and risk-gate changes are policy-level quality controls; they do not prove review quality, human agreement, or live-platform latency on unseen papers. No production claim, post, browser action, or network side effect occurred."
+  "claim_boundary": "The Python runtime evidence uses an explicit deterministic mock verifier and synthetic fixtures to prove state transitions, gates, bounded concurrency, repair scope, and recovery behavior. The separate native verifier acceptance is qualitative evidence on one frozen real-paper draft. The two-paper trial is not evidence of general review quality, human agreement, production OpenAgentReview integration, or live-platform latency. No live post, browser action, or network side effect occurred."
 }

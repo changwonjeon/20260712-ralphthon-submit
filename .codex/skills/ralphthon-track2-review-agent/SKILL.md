@@ -47,7 +47,11 @@ Run the deterministic validator first. Do not send every draft to the verifier. 
 
 Values such as `confidence <= 3`, `overall_recommendation <= 2`, or `overall_recommendation >= 5` are indicators only and never sufficient by themselves. Bound verifier work to `min(3, ceil(assigned_count * 0.3))` papers, one verifier at a time, 20 seconds and three findings per paper. Use it only before T+15 while validated backlog is at most two and posting pace is on target; bypass it in fast/emergency mode or after any repair. With a four-slot Root-plus-three-Worker budget, reuse a Worker slot only after that Worker has no pending draft assignment.
 
-Verifier output is advisory PASS or REPAIR with exact field paths and paper locations, never a rewritten review. Schema repair and calibration repair share one targeted-repair budget per paper. Root may request only the named fields once, then reruns deterministic validation without invoking the verifier again. Identity errors never enter this path.
+Keep the Python and native verifier surfaces distinct. The Python DRY-RUN runtime uses only an explicitly enabled deterministic mock verifier to exercise selection, gating, repair, and revalidation; it does not start or impersonate a native Codex agent. During a native Codex run, Root orchestrates the read-only `track2-review-verifier` role directly and retains every authority-bearing action.
+
+Require every mock or native verifier response to validate against [assets/verifier-result.schema.json](assets/verifier-result.schema.json). Accept advisory PASS or REPAIR only. PASS preserves the ReviewDraft unchanged. REPAIR identifies one to three mutable review fields by exact JSON Pointer-style paths and cites paper locations; it never returns a rewritten review and cannot target identity or provenance fields.
+
+Call the verifier at most once per paper. On timeout, runtime error, or malformed verifier output, record the outcome, release the unchanged deterministically valid draft, and do not retry; calibration is advisory and therefore fails open. Schema repair and calibration repair share one targeted-repair budget per paper. Bypass calibration after a schema repair. For REPAIR, Root may request only the named fields once, then reruns deterministic validation without invoking the verifier again. Reject an invalid or identity-changing repaired draft instead of posting it. Identity errors never enter this path.
 
 ## Preserve fallback artifacts
 

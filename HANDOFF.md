@@ -3,8 +3,8 @@ type: Human Handoff
 title: Ralphthon Track 2 Build and Submission Handoff
 description: Acceptance status, frozen evidence, commands, limitations, live boundary, and human checks.
 tags: [ralphthon, track-2, handoff, submission]
-timestamp: 2026-07-12T16:15:52+09:00
-status: local-build-installed-discovered-live-unverified
+timestamp: 2026-07-12T17:35:00+09:00
+status: local-build-installed-calibration-executed-live-unverified
 ---
 
 # Ralphthon Track 2 Handoff
@@ -19,25 +19,26 @@ An independent native `agent_type=architect` audit passed the staged
 architecture, and changed-files-only cleanup plus the full post-clean
 regression and submission audit passed.
 
-The verified 28-file package is installed under project `.codex`. A genuinely
+The verified 29-file package is installed under project `.codex`. A genuinely
 fresh Codex session exposed both Skills and successfully spawned all three
 custom native roles. No production claim or post occurred; the actual
-OpenAgentReview contract and live completion remain unverified until the
-authorized 16:35 KST window.
+OpenAgentReview contract and live completion remain unverified.
 
 The final performance pass adds evidence-first Worker calibration and a bounded
 high-risk verifier lane without changing the three-Worker fast path or frozen
 ReviewDraft schema. The verifier is capped at ceil(30%)/three papers, one at a time
 for 20 seconds, before T+15 and only with backlog at most two. It shares the
-single repair budget and has no platform or ledger authority.
+single repair budget and has no platform or ledger authority. The Python
+runtime now executes this control flow in explicit mock-only DRY-RUN mode;
+native verifier work remains a separate Root-owned Codex operation.
 
 ## P0 acceptance status
 
 | P0 gate | Status | Evidence or blocker |
 | --- | --- | --- |
 | Official `auto-research` pinned at `a9f4f2583648ef4ca54f980f951ae393d153473f` | PASS INSTALLED | Staging and project `.codex` match the 11-file manifest and upstream recursive diff |
-| Combined two-Skill and three-agent staged installer | PASS | `scripts/install-track2-codex.py --check-staging` validates 28/28 files |
-| Official and wrapper Skills installed in project `.codex` | PASS | Installer read-back reports 28/28 exact matches, zero missing, zero conflicts |
+| Combined two-Skill and three-agent staged installer | PASS | `scripts/install-track2-codex.py --check-staging` validates 29/29 files |
+| Official and wrapper Skills installed in project `.codex` | PASS | Installer read-back reports 29/29 exact matches, zero missing, zero conflicts |
 | Wrapper Skill with references, assets, and validators | PASS INSTALLED | Staging and project-local copies match |
 | Review Worker, build verifier, submission auditor | PASS INSTALLED AND DISCOVERED | Three typed custom-role spawns returned their expected completion tokens |
 | Canonical upstream plus event review schema | PASS | Contribution, Significance, Originality, and Comment remain independent |
@@ -46,7 +47,7 @@ single repair budget and has no platform or ledger authority.
 | Bounded queue, lease, atomic ledger, idempotency, status-first reconciliation | PASS IN SYNTHETIC MOCK | Frozen aggregate plus ledger and failure evidence |
 | Gold fixture, matching rule, threshold, and naive baseline frozen before run | PASS | `fixtures/FROZEN_MANIFEST.sha256` and fixture validation evidence |
 | Three 10-paper repetitions | PASS IN SYNTHETIC MOCK | 30/30 complete, schema 100%, duplicate posts 0 |
-| Evidence-first and risk-gated calibration | PASS BY CONTRACT AND FRESH EVALUATOR | Native Worker instructions 2,224/4,096 bytes; compound gate, ceil(30%)/three-paper cap, 20-second bound; `evidence/performance-optimization.json` |
+| Evidence-first and risk-gated calibration | PASS IN EXECUTABLE DRY-RUN | Explicit risk sidecar and deterministic mock verifier exercised the compound gate, ceil(30%)/three-paper cap, serial verifier, PASS/REPAIR/fault paths, shared repair budget, revalidation, ledger, and summary; `evidence/performance-optimization.json` |
 | Malformed JSON, Worker timeout, claim timeout, post timeout, in-process ledger reopen | PASS IN SYNTHETIC MOCK | Each condition recovered once without duplicate posts |
 | Actual process interruption and fresh-process resume | PASS IN SYNTHETIC MOCK | `evidence/process-restart-proof/aggregate.json`; exit 75 to 0, final 10/10, prefix and prior artifacts preserved |
 | Process rerun idempotency | PASS IN SYNTHETIC MOCK | Ledger and outbox byte-identical after rerun |
@@ -56,9 +57,10 @@ single repair budget and has no platform or ledger authority.
 | `review-agent.md` and root `README.md` | PASS | Final evidence identities, mock/live boundary, and install instructions are present |
 | New-session discovery for both Skills | PASS | `evidence/external-final-verification.json` |
 | Explicit native architect verification | PASS FOR ARCHITECTURE; ENVIRONMENT BLOCKER RESOLVED LATER | The preserved 14:00 snapshot is `evidence/architect-audit.md`; post-Ralph install/discovery resolution is recorded separately |
-| Full post-clean runtime and package regression | PASS | 49/49 tests; compileall; wrapper 17/17, upstream 11/11, fixtures 16/16, installer 28/28; root and JSON audits |
+| Full current runtime and package regression | PASS | 70/70 tests; py_compile; installed/staged equality; staged and installed Skill validation; installer 29/29; JSON and diff audits |
+| Frozen real-paper qualitative trial | PASS WITH SCOPE LIMITS | Two public arXiv PDFs, 2/2 manifest/schema-valid reviews, separate verifier PASS, zero repairs, and one fresh native strict-JSON acceptance; no gold review, author rebuttal, external novelty search, code execution, or platform side effect |
 | Changed-files-only cleanup | PASS | `evidence/ai-slop-cleaner-report.md`; root direct diff review and post-clean read-back completed |
-| Production claim/post and live completion | NOT RUN | Authorized window begins at 16:35 KST |
+| Production claim/post and live completion | NOT RUN | No verified production adapter or observed live platform contract |
 
 ## Authoritative quantitative evidence
 
@@ -112,7 +114,7 @@ The canonical frozen task-prompt asset SHA-256 is
 The canonical frozen schema SHA-256 is
 `cd19220f5435dc1da4146bd7c1e467cf4bea0ac0ecb69b2ac518b53922363d24`.
 The wrapper manifest SHA-256 is
-`38f2c01d2d27d3f8451f97167a3fbec9b11bfa4723d1f8ca72e0484723a9d0f7`.
+`b9fc57b4755c00d273a999be3c7900d2fc7d85c1c897f8fd91a6e8149bc3eaba`.
 
 ## Skill and agent installation
 
@@ -189,8 +191,11 @@ python3 tests/run_mock_evidence.py \
 It exited successfully and intentionally emitted no standard output. Do not
 overwrite that directory; use a new output directory for a recheck.
 
-The final fresh post-clean regression record is
-`evidence/post-clean-verification.json`:
+The historical post-clean regression record is
+`evidence/post-clean-verification.json`. The current executable-calibration
+and regression record is `evidence/performance-optimization.json` and reports
+70/70 tests, exact installed/staged equality, a serial bounded mock verifier,
+and 30/30 duplicate-free normal mock completions. The earlier snapshot remains:
 
 ```text
 exit_code=0
@@ -230,14 +235,14 @@ four English pages and all six Korean pages after their final builds.
 Final artifact SHA-256 values are:
 
 ```text
-bec9154a3a4e0555e4e6871e8cbefe11a77d0a84906b29af791daabbd918bb84  submission/technical-report.tex
-250b0329cbebf86d840aaea1d704617137d48fa760778404bf0deaf1774c3a22  submission/technical-report.pdf
+5a4227d988107c2673c8dff4509ef8ac8b719be53e4bc5c061bcc740518627bc  submission/technical-report.tex
+66d8d96c8b2cd4b054241e05d5458f4aa8ab4a83ffe56fff36d11811d35467dc  submission/technical-report.pdf
 23451a0afe573a7ca17e8de1e81c32a20fe7ff09ec6cfee017253fb888c9147e  submission/TITLE.txt
-b58f8104efaf209c07fd1013b3333d619a5d3fc259086eea15116a43b0811a77  submission/ABSTRACT.txt
-a1a29c7d43619c8b628083c02f5e0ce342037473c6480e785bb6b79313821daa  submission/technical-report_kr.tex
-d8a28fd6eafc5a56fe51db87cb3b79ec580fbf05b84b9f6fcf69962bdf954fbc  submission/technical-report_kr.pdf
+16b52aaa453fbb0a2df2b4895d597fc79661b0f4d0faef724453da3a76daec95  submission/ABSTRACT.txt
+69048ed093615aa37123005dcf4288b3f8b59ae88073d664bb015bd0a1f6f255  submission/technical-report_kr.tex
+1ee2c4d024e1ce4c60e29c6748cc4005e72d9401e27be64f8dfa540630b4f3ba  submission/technical-report_kr.pdf
 71bbdcd386cb261a2a53db8e568530b1cf990207d9341d1916933c044c36ae08  submission/TITLE_kr.txt
-0af33ee1700f27e7ff5a88dca3f30025e161e92b6799371d29862bcc5d76bfaf  submission/ABSTRACT_kr.txt
+73cefb07389a0015f5375fdd2b47d92a0666ff291f87c39e1602c301ed4cfa4e  submission/ABSTRACT_kr.txt
 ```
 
 ## Deliverables
@@ -257,6 +262,10 @@ d8a28fd6eafc5a56fe51db87cb3b79ec580fbf05b84b9f6fcf69962bdf954fbc  submission/tec
 - Frozen runtime and quality aggregate:
   `evidence/mock-validation-final-20260712T1335KST/aggregate.json`
 - Actual process resume proof: `evidence/process-restart-proof/aggregate.json`
+- Executable calibration and current regression evidence:
+  `evidence/performance-optimization.json`
+- Frozen two-paper qualitative review trial:
+  `review_trials/20260712-real-paper-trial/`
 - Fresh post-clean regression: `evidence/post-clean-verification.json`
 - Independent native architect audit: `evidence/architect-audit.md`
 - Changed-files-only cleanup report: `evidence/ai-slop-cleaner-report.md`
@@ -265,7 +274,7 @@ d8a28fd6eafc5a56fe51db87cb3b79ec580fbf05b84b9f6fcf69962bdf954fbc  submission/tec
 - Report build and audit evidence: `evidence/report/`
 - Upstream Skill manifest: `staging/auto-research.sha256`
 - Wrapper and agent manifest: `staging/ralphthon-track2-review-agent.sha256`,
-  SHA-256 `38f2c01d2d27d3f8451f97167a3fbec9b11bfa4723d1f8ca72e0484723a9d0f7`
+  SHA-256 `b9fc57b4755c00d273a999be3c7900d2fc7d85c1c897f8fd91a6e8149bc3eaba`
 - Staged package validation: `evidence/discovery/staged-codex-validation.txt`
 - Post-Ralph install and fresh-session discovery:
   `evidence/external-final-verification.json`, SHA-256
@@ -321,7 +330,7 @@ d8a28fd6eafc5a56fe51db87cb3b79ec580fbf05b84b9f6fcf69962bdf954fbc  submission/tec
    and `evidence/completion-audit.json` contain the authoritative later
    read-back.
 
-## 16:35 KST live command and boundary
+## Authorized live-window command and boundary
 
 With the project-local package installed and fresh-session discovery already
 verified, invoke at the authorized live window:

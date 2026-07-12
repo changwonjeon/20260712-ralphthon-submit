@@ -1,0 +1,156 @@
+{
+  "review_draft_version": "1.0",
+  "paper_id": "2607.08173v1",
+  "lease_id": "offline-trial-2607.08173v1-1",
+  "summary": "The paper proposes overthinking, a weight-space intervention that extrapolates from an instruction model toward a reasoning model, and tests whether amplification exposes hidden information in four synthetic auditing settings. It also studies layer-wise attenuation, Fisher-weighted coefficients, norm-matched random perturbations, leak location, and composition with prefill attacks. The experiments suggest structured task-vector directions help for Taboo and SSC, whereas Gender and MMLU are substantially susceptible to generic perturbation; the current endpoint construction does not yet isolate reasoning amplification as the causal mechanism.",
+  "strengths": [
+    {
+      "claim": "The core intervention and its layer-wise variants are operationally simple and clearly formulated.",
+      "location": "Section 3.1, Equation 1 (page 3); Section 3.2, Equations 2-5 (pages 4-5)"
+    },
+    {
+      "claim": "The layer-norm and global-norm random baselines test a meaningful generic-parameter-disruption alternative while matching perturbation energy.",
+      "location": "Section 3.3 (page 4); Figure 3 (page 6)"
+    },
+    {
+      "claim": "The evaluation spans four qualitatively different synthetic secret settings and separately reports thinking-only and response disclosure.",
+      "location": "Section 4.1 (page 5); Table 4 (page 9)"
+    },
+    {
+      "claim": "The paper reports negative evidence and distinguishes directionally protected settings from noise-fragile settings rather than hiding the random-perturbation result.",
+      "location": "Figure 4 (page 6); Section 6.2 (page 9)"
+    },
+    {
+      "claim": "The authors disclose important single-family, synthetic-setting, judge-validity, and sample-size limitations.",
+      "location": "Section 6.3 (page 9)"
+    }
+  ],
+  "weaknesses": [
+    {
+      "claim": "The reasoning vector may be contaminated by the secret-training update: Section 3.1 assumes M and R differ only through reasoning distillation, but Section 4.3 says secret LoRA training starts from R and is merged before task-vector experiments, without stating that the same adapter is applied to both endpoints.",
+      "location": "Section 3.1 (page 3); Section 4.3 (page 5); Appendix C (page 12)"
+    },
+    {
+      "claim": "For non-uniform layer coefficients, alpha=1 in Equation 2 does not recover R, so comparisons labeled as the reasoning-model baseline conflate layer reshaping with amplification; Table 3 already shows best and uniform differ at alpha=1.",
+      "location": "Equations 1-2 (pages 3-4); Table 3 (page 7)"
+    },
+    {
+      "claim": "Table 3 selects the highest-leak coefficient method separately in each cell, creating post-hoc selection bias unless selection occurred on a disjoint development set; no uncertainty is given for these selected maxima.",
+      "location": "Table 3 and its caption (page 7)"
+    },
+    {
+      "claim": "Equation 4 divides the directional quadratic form by the L2 norm rather than the squared L2 norm, so the quantity is not invariant to task-vector scale despite being interpreted as directional sensitivity; this also affects Equation 5.",
+      "location": "Section 3.2, Equations 4-5 (page 4)"
+    },
+    {
+      "claim": "Leak and quality labels rely on keyword rules and GPT-4.1-mini without blinded human or independent-judge validation, and the paper gives no multi-seed fine-tuning or generation robustness.",
+      "location": "Section 4.1 (page 5); Appendices C and F (pages 12-14); Section 6.3 (page 9)"
+    },
+    {
+      "claim": "The compositional claim is overstated: Prefill+OT(best) gives no gain for Gender, only +0.2 percentage points for MMLU, and underperforms OT alone for Taboo; the clearest stacking gain is SSC.",
+      "location": "Table 3 and Section 5.2 (page 7)"
+    },
+    {
+      "claim": "Several internal inconsistencies require correction: Figure 8 gives conflicting collapse windows and knees, Table 6 duplicates complete metric rows across model sizes, Section 4.2 miscounts the methods, and one reference retains an incomplete arXiv identifier.",
+      "location": "Section 4.2 (page 5); Figure 8 (page 14); Table 6 (page 16); References (page 10)"
+    }
+  ],
+  "questions": [
+    "What exact weights constitute M and R after secret-organism fine-tuning, and is an identical secret LoRA delta applied to both endpoints before subtraction?",
+    "How is the alpha=1 baseline defined for non-uniform layer coefficients, given that Equation 2 does not recover R when lambda differs from one?",
+    "Was each Table 3 best method selected on held-out data, and what multiplicity correction covers method and alpha selection?",
+    "Is the denominator in Equation 4 intended to be the squared L2 norm, and which equation was implemented?",
+    "Which exact numerator and denominator support the up-to-10x claim, and what are the confidence interval and corrected p-value?",
+    "Were the 256 MMLU Fisher-calibration samples disjoint from the 256 MMLU evaluation samples?",
+    "Why are the Identity Confusion and Chinese Score rows in Table 6 identical across 2B, 4B, and 8B for every alpha?",
+    "Can the authors provide repeated fine-tuning and generation seeds plus blinded human or independent-judge validation?"
+  ],
+  "soundness": 2,
+  "presentation": 2,
+  "contribution": 3,
+  "significance": 3,
+  "originality": 3,
+  "overall_recommendation": 3,
+  "confidence": 4,
+  "comment": "The idea is promising and the matched random baselines are valuable, but the next version must specify the exact endpoint weights, add a same-secret-adapter-at-both-endpoints control, define a valid alpha=1 baseline for non-uniform coefficients, clarify or correct Equation 4, evaluate method selection on held-out data, validate the leak judges independently, and resolve the appendix/table inconsistencies. Until then, the defensible claim is that structured weight directions expose some synthetic secrets, not that reasoning amplification is the established causal mechanism.",
+  "ethics_and_limitations": "The Impact Statement appropriately notes dual-use secret extraction and the white-box-access constraint. Additional concerns are that reasoning traces may expose sensitive or memorized information absent from final responses, and the binary Gender organism and identity-absorption examples may reinforce stereotypes. Evidence is limited to synthetic secrets in one Qwen3-VL family, and unvalidated automated judges create false-positive and false-negative risk in a safety-sensitive auditing setting.",
+  "evidence_trace": [
+    {
+      "claim": "The paper defines overthinking as extrapolation along the released-model weight difference.",
+      "location": "Section 3.1, Equation 1 (page 3)"
+    },
+    {
+      "claim": "Secret-organism fine-tuning starts from the reasoning model and is merged before task-vector experiments, leaving endpoint symmetry unspecified.",
+      "location": "Section 4.3 (page 5); Appendix C (page 12)"
+    },
+    {
+      "claim": "Equation 2 does not recover R at alpha=1 for non-uniform lambda values.",
+      "location": "Section 3.2, Equation 2 (page 4)"
+    },
+    {
+      "claim": "Equation 4 uses an unsquared L2 norm in the denominator while claiming directional sensitivity.",
+      "location": "Section 3.2, Equation 4 (page 4)"
+    },
+    {
+      "claim": "Matched random perturbations fail to explain Taboo and SSC but are competitive or stronger for the noise-fragile settings.",
+      "location": "Figures 3-4 (page 6); Section 6.2 (page 9)"
+    },
+    {
+      "claim": "Table 3 chooses the best coefficient method separately per cell and shows the clearest composition gain only for SSC.",
+      "location": "Table 3 and Section 5.2 (page 7)"
+    },
+    {
+      "claim": "The leak-location rows sum to 100% and show that thinking-only leaks are common.",
+      "location": "Table 4 (page 9)"
+    },
+    {
+      "claim": "Figure 8's caption and adjacent text disagree about the auditing window, collapse threshold, and perplexity knee.",
+      "location": "Figure 8 and Appendix G (page 14)"
+    },
+    {
+      "claim": "Table 6 repeats identical Identity Confusion and Chinese Score rows across all three model sizes.",
+      "location": "Table 6 (page 16)"
+    },
+    {
+      "claim": "The paper explicitly states that human annotation, multi-judge validation, a larger sweep, and cross-family results were not completed.",
+      "location": "Section 6.3 (page 9)"
+    }
+  ],
+  "score_rationales": {
+    "soundness": {
+      "claim": "The matched controls are useful, but unresolved vector contamination, alpha=1 semantics, possible Equation 4 scaling error, post-hoc method selection, and unvalidated judges materially affect the central causal claim.",
+      "location": "Sections 3-5 and Appendices C, F (pages 3-7 and 12-14)"
+    },
+    "presentation": {
+      "claim": "The main narrative is readable, but Equation 4, the method count, Figure 8, Table 6, and an incomplete citation contain substantive auditability or consistency problems.",
+      "location": "Section 4.2 (page 5); Figure 8 (page 14); Table 6 (page 16); References (page 10)"
+    },
+    "contribution": {
+      "claim": "Reasoning-vector extrapolation with layer-wise controls is an experimentally rich and potentially useful auditing primitive.",
+      "location": "Sections 3.1-3.3 (pages 3-4); Figures 3-4 (page 6)"
+    },
+    "significance": {
+      "claim": "Surfacing hidden model information is important for safety auditing, although the current evidence is synthetic, white-box, and limited to one model family.",
+      "location": "Introduction (pages 1-2); Section 6.3 and Impact Statement (pages 9-10)"
+    },
+    "originality": {
+      "claim": "Applying reasoning-model task-vector extrapolation to secret elicitation appears distinct within the paper's cited literature; no external novelty search was performed.",
+      "location": "Section 2 and contribution list (pages 2-3)"
+    },
+    "overall_recommendation": {
+      "claim": "The paper has clear merit, but it does not yet isolate reasoning amplification as the causal mechanism and requires substantial methodological and reporting revision.",
+      "location": "Sections 3-6 and Tables 3, 6 (pages 3-9 and 16)"
+    },
+    "confidence": {
+      "claim": "All 19 pages and appendices were inspected and several equations and tables were cross-checked, but raw code, training artifacts, judge labels, and external novelty evidence were unavailable.",
+      "location": "Pages 1-19; saved result in verification/2607.08173v1.verifier.md"
+    }
+  },
+  "worker_id": "review-worker-A-independent",
+  "agent_version": "ralphthon-track2-real-trial-v1",
+  "prompt_hash": "29e116b4b25663b65ff9920057a87d2b850080b97be836b364149cb95d9d914a",
+  "input_hash": "311f10ab570c14d69834f9ba94b66af5f74874c9a7effe49aa3b81f2bc8def50",
+  "evidence_hash": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945",
+  "started_at": "2026-07-12T07:35:00Z",
+  "completed_at": "2026-07-12T07:40:30Z"
+}

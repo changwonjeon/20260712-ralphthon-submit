@@ -141,6 +141,29 @@ def main() -> int:
             )
             summaries.append(json.loads(result.stdout))
 
+        calibration_result = run(
+            [
+                sys.executable,
+                "-m",
+                "ralphthon_track2_review_agent.run_batch",
+                "--mode",
+                "DRY-RUN",
+                "--papers",
+                "fixtures/throughput/papers.json",
+                "--root-dir",
+                ".",
+                "--output-dir",
+                str(temporary_root / "calibration-high-risk-pass"),
+                "--workers",
+                "3",
+                "--calibration",
+                "mock",
+                "--calibration-plan",
+                "fixtures/calibration/high-risk-pass.json",
+            ]
+        )
+        calibration_summary = json.loads(calibration_result.stdout)
+
         live_output = temporary_root / "live-guard"
         run(
             [
@@ -159,6 +182,18 @@ def main() -> int:
             expected=2,
         )
         checks["live_guard_before_writes"] = not live_output.exists()
+
+    checks["calibration_runtime_executed"] = (
+        calibration_summary["success"] is True
+        and calibration_summary["calibration_adapter"] == "mock"
+        and calibration_summary["risk_scored_count"] == 10
+        and 1 <= calibration_summary["verifier_selected_count"] <= 3
+        and calibration_summary["verifier_selected_count"]
+        == calibration_summary["verifier_pass_count"]
+        and calibration_summary["verifier_cap"] == 3
+        and calibration_summary["verifier_max_active"] == 1
+        and calibration_summary["posted_verified"] == 10
+    )
 
     checks["mock_30_of_30"] = sum(int(item["posted_verified"]) for item in summaries) == 30
     checks["mock_schema_30_of_30"] = sum(

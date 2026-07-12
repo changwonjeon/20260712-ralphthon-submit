@@ -1,0 +1,348 @@
+                                                Best-of-N TTS Evaluation is Confounded by ASR Family Alignment
+
+
+                                                                                      Taehyung Yu 1 Seongjae Kang 1
+
+
+                                                                 Abstract                                   and select the one whose ASR-decoded transcript matches
+                                                                                                            the target text most closely.
+                                             Best-of-N (BoN) inference improves content
+                                             consistency in zero-shot text-to-speech by se-                 BoN is reported to reduce WER by 10–30% relative across
+                                             lecting from N candidates with an automatic                    recent flow-matching systems, but the literature is inconsis-
+                                             speech recognition (ASR) verifier. We identify                 tent on which verifier ASR to use—reported choices include
+                                             an underexplored evaluation confound: a veri-                  wav2vec 2.0 (Baevski et al., 2020), Whisper (Radford et al.,
+                                             fier’s apparent quality depends strongly on which              2023), and its distillations (Gandhi et al., 2023)—and the
+                                             ASR family judges it. On LibriSpeech-PC test-                  evaluation ASR is usually a single fixed model. The choice
+                                             clean (Meister et al., 2023) with F5-TTS (Chen                 of evaluator is a design decision that has so far received no
+                                             et al., 2025), verifier rankings reverse across Whis-          systematic attention.
+
+
+
+
+arXiv:2607.08256v1 [cs.CL] 9 Jul 2026
+                                             per, wav2vec 2.0, and HuBERT evaluators, and
+                                                                                                            In this paper we run a four-way evaluator ablation spanning
+                                             same-family verifier–evaluator pairs recover 2–
+                                                                                                            the Whisper (Radford et al., 2023), wav2vec 2.0 (Baevski
+                                             3× more oracle headroom than cross-family pairs
+                                                                                                            et al., 2020), and HuBERT (Hsu et al., 2021) families (§3)
+                                             despite near-identical representations (linear CKA
+                                                                                                            over a shared set of BoN candidates. Our contributions are
+                                             0.978)—a pattern consistent with identity- or
+                                                                                                            the following.
+                                             lineage-level coupling rather than representational
+                                             overlap. We propose two cross-family rank en-
+                                             sembles (rank-averaging and conjunctive max-                      • We document that BoN verifier rankings are systemati-
+                                             rank) that attain the lowest mean WER across                        cally evaluator-dependent: the same generated outputs
+                                             three independent evaluators—1.61% at N =10                         are ranked in opposing directions by evaluators from
+                                             (−12% relative to F5-TTS)—with no measurable                        different ASR families, so the verifier preferred under
+                                             degradation under automatic SIM-o/UTMOS met-                        one family can lose under another (§4).
+                                             rics; the best single verifier drives WER from                    • We quantify the magnitude of this confound on
+                                             2.06% to 1.72% (−16.5%) under the official F5-                      LibriSpeech-PC test-clean and show that the (verifier,
+                                             TTS evaluator. We recommend cross-evaluator                         evaluator) family pairing is a much larger lever on re-
+                                             triangulation as default reporting practice.                        ported WER than the choice between common verifier
+                                                                                                                 checkpoints, while a large oracle headroom remains
+                                                                                                                 unexploited (§4).
+                                                                                                               • We rule out audio-encoder representation similarity
+                                        1. Introduction
+                                                                                                                 (linear CKA) as the dominant explanation; the pattern
+                                        Recent flow-matching zero-shot TTS systems—F5-                           is instead consistent with identity- or lineage-level cou-
+                                        TTS (Chen et al., 2025), E2 TTS (Eskimez et al., 2024),                  pling between verifier and evaluator, a speech analog
+                                        CosyVoice 2 (Du et al., 2024), MaskGCT (Wang et al.,                     of LLM-as-a-judge self-bias (§5).
+                                        2025), Seed-TTS (Anastassiou et al., 2024), Natural-                   • We propose cross-family rank ensembles that select
+                                        Speech 3 (Ju et al., 2024)—produce speech that is                        candidates by aggregating verifiers across ASR fami-
+                                        indistinguishable from human recordings in naturalness                   lies, and recommend cross-evaluator triangulation—
+                                        and speaker similarity, yet still produce word-level content             reporting WER under at least two ASR families with
+                                        errors on a non-trivial fraction of utterances. Best-of-N                disjoint training lineages—as a default reporting prac-
+                                        (BoN) inference is the standard inference-time remedy: syn-              tice (§4.4).
+                                        thesize N candidates with different random initializations
+                                           1
+                                             KAIST, Daejeon, South Korea. Correspondence to: Taehyung       2. Related Work
+                                        Yu <taehyung.yu@kaist.ac.kr>.
+                                                                                                            Inference-time remedies for flow-matching TTS—classifier-
+                                        Accepted at ICML 2026 Workshop on Machine Learning for Audio,       free guidance (CFG) (Ho & Salimans, 2021), BoN rerank-
+                                        Seoul, South Korea. Copyright 2026 by the author(s).                ing (Du et al., 2024; Yang et al., 2025), reverse inference (Hu
+
+                                                                                                        1
+                             Best-of-N TTS Evaluation is Confounded by ASR Family Alignment
+
+et al., 2024)—report no cross-evaluator validation; recent       Table 1. LibriSpeech-PC test-clean under the official fwhisper-lgv3
+                                                                 evaluator. “rel” is WER reduction vs. F5-TTS; “p” is a two-sided
+strong systems (Anastassiou et al., 2024; Ju et al., 2024)       paired permutation test against F5-TTS (10,000 permutations).
+similarly tune verifiers against a single fixed ASR. Speech
+preference optimization (Zhang et al., 2024) shares the same         Method              WER CER         RTF        rel     p
+single-judge risk. BoN scaling theory in LMs (Yu et al.,             F5-TTS (baseline)    2.06   0.71   0.190    —     —
+2025; Wang et al., 2024) motivates verifier ensembling               BoN w2v2-base        1.99   0.62   0.383   −3.5% 0.31
+but has no TTS analog. The structural precedent is LLM-              BoN distil-sm        2.04   0.59   0.388   −1.0% 0.93
+as-judge self-bias (Zheng et al., 2023); we document the             BoN distil-v3        1.88   0.53   0.379   −8.7% 0.030
+speech analog. Evaluator-driven shifts in spoken-language            BoN ens3             1.91   0.54   0.429   −7.2% 0.057
+conclusions are established for ASR fairness (Koenecke
+et al., 2020; Feng et al., 2024) and for MOS-predictor cross-    Table 2. Cross-evaluator WER (%) on LibriSpeech-PC test-clean.
+                                                                 The same generated audio is evaluated by ASR checkpoints from
+domain generalization (Cooper et al., 2022; Mittag et al.,
+                                                                 different families (aliases defined in §3); the preferred verifier
+2021; Baba et al., 2024).                                        (bold) changes with the evaluator.
+
+3. Setup                                                            Method               fwhisper-lgv3 w2v2-lv60 hubert-lg
+                                                                    F5-TTS (baseline)         2.06           1.52         1.92
+Synthesis. We use the publicly released F5-TTS base                 BoN w2v2-base             1.99           1.41         1.74
+model (Chen et al., 2025) with its default inference recipe:        BoN distil-sm             2.04           1.50         1.77
+32 ODE solver steps, CFG (Ho & Salimans, 2021) scale                BoN distil-v3             1.88           1.45         1.74
+                                                                    BoN ens3                  1.91           1.45         1.76
+2.0, and sway sampling. We generate 10 BoN candidates
+per utterance; for each N ∈ {3, 5, 10} we take the lead-
+ing N candidates and select the one with the lowest joint
+                                                                 MOS (Saeki et al., 2022) score from the standard 22-strong
+WER+CER score against the reference transcript.
+                                                                 checkpoint. Real-time factors are measured isolated on a
+Verifiers. We compare three single-model verifiers and one       single RTX 4090 GPU.
+three-way ensemble. The single verifiers are a wav2vec 2.0
+                                                                 Reproducibility. All models are used at their default
+base model (95M parameters; w2v2-base), a small Distil-
+                                                                 public revisions; code, decoding settings, and evalua-
+Whisper (166M; distil-sm), and a large Distil-Whisper
+                                                                 tion scripts are available at https://github.com/
+(756M; distil-v3). ens3 denotes the three-way rank-average
+                                                                 yu1012/BoN-TTS.
+of these three verifiers. In the scaling study (§4.4) we ad-
+ditionally consider two cross-family rank ensembles that
+aggregate only the cross-family pair {w2v2-base, distil-v3}.     4. Main Results
+Evaluators. For the main results (§4) we score every can-        4.1. Results under the F5-TTS Evaluator
+didate with four ASR evaluators spanning three families:
+a Whisper-large-v3 evaluator served via the faster-whisper       Our single-shot F5-TTS baseline reaches 2.06% WER,
+runtime (fwhisper-lgv3, the official F5-TTS evaluator (Chen      within 0.36 pp of the 2.42% multi-seed mean reported in
+et al., 2025)); a large wav2vec 2.0 model (w2v2-lv60); the       the F5-TTS paper (Chen et al., 2025)—a single-shot vs.
+same Distil-Whisper used as a verifier (distil-sm); and a        multi-seed-mean gap, not a pipeline discrepancy. BoN with
+large HuBERT model (hubert-lg). For the CKA–WER anal-            distil-v3 drives WER to 1.88% (−8.7%, p=0.030) at RTF
+ysis (§5) we additionally include Whisper-medium (whisper-       0.379, the only significant single-verifier reduction; ens3 is a
+med) as a fourth evaluator to expand the pool of evaluator       close runner-up (−7.2%, p=0.057). The w2v2-base verifier
+pairs.                                                           improves the point estimate (−3.5%) but is not significant
+                                                                 (p=0.31), and distil-sm is flat (p=0.93). Speaker similarity
+Data & normalization. We evaluate on the LibriSpeech-            (SIM-o) stays within ±0.0006 and UTMOS within ±0.005
+PC test-clean cross-sentence subset (Meister et al., 2023)       of F5-TTS across all configurations (§5.1), so the WER gain
+(1127 samples, 4–10 s reference) and run the F5-TTS offi-        comes at no measurable quality cost.
+cial evaluation pipeline verbatim, applying its default text
+normalization uniformly to all four ASR outputs. Whisper’s       4.2. Cross-Evaluator Triangulation
+English-specific normalizer is not applied separately, to keep
+the cross-ASR WER comparison on the same footing.                Same-family preference. Under fwhisper-lgv3 (Table 2),
+                                                                 the Distil-Whisper verifier (distil-v3) wins; under w2v2-
+Quality. Speaker similarity SIM-o is the cosine of               lv60, the wav2vec 2.0 verifier (w2v2-base) wins; under
+WavLM (Chen et al., 2022) speaker embeddings; reference          hubert-lg, w2v2-base again ranks at the top alongside distil-
+and synthesized audio are resampled symmetrically from           v3.
+24 kHz to 16 kHz before scoring. Naturalness is the UT-
+                              Best-of-N TTS Evaluation is Confounded by ASR Family Alignment
+
+Table 3. Oracle headroom on LibriSpeech-PC test-clean with
+
+
+
+                                                                        Mean WER (%)
+N =3 candidates per sample. Single-shot = first candidate; Or-                         1.8
+acle = per-sample best of 3. The bottom block reports recovery
+(Single−BoN)/(Single−Oracle) in %; same-family BoN recov-                              1.7
+ers 2–3× more than cross-family BoN on the same audio. The
+0.02 pp gap between Single-shot = 2.04 here and F5-TTS = 2.06                          1.6
+in Tables 1/4 is Whisper batching non-determinism (decoded in an                             3              5                           10
+N =3 batch vs. a single utterance); both rows describe identical
+synthesized audio.                                                                                       N (BoN candidates)
+                                                                                                  w2v2-base       distil-v3          rank-avg
+                                                                                                  max-rank        F5-TTS
+                      fwhisper-lgv3 w2v2-lv60 hubert-lg
+    Single-shot           2.04           1.52       1.94           Figure 1. Mean WER (averaged over fwhisper-lgv3, w2v2-lv60,
+    Oracle (N =3)         1.42           1.09       1.18           hubert-lg) vs. N , from Table 4. Both cross-family rank ensembles
+    Headroom (pp)         0.63           0.43       0.76           (rank-avg, max-rank) at N =5 reduce WER under all three evalua-
+    Recovery (%) of oracle headroom:                               tors simultaneously, while the single w2v2-base verifier regresses
+    BoN w2v2-base          7.9           26.1       27.1           on fwhisper-lgv3 at N =5. Cross-family ensembles scale mono-
+    BoN distil-sm          0.0            6.8       22.6           tonically with N .
+    BoN distil-v3         26.0           18.2       27.1
+    BoN ens3              20.5           17.0       24.5           Table 4. Scaling N on LibriSpeech-PC test-clean. Per-evaluator
+                                                                   WER (%) under three evaluators (aliases as defined in §3). The
+                                                                   p-value column reports a two-sided paired permutation test against
+                                                                   F5-TTS under fwhisper-lgv3 (10,000 permutations). “↑” marks a
+Magnitude of the swing. The distil-v3 BoN reduction is
+                                                                   regression vs. the same row at the preceding N .
+0.18 pp under fwhisper-lgv3 but only 0.07 pp under w2v2-
+lv60, reversing the verifier ranking between Whisper and           Method (N )                   fwhisper-lgv3 w2v2-lv60 hubert-lg mean          p
+wav2vec 2.0 evaluators. A reader given only the F5-TTS             F5-TTS (baseline)                 2.06        1.52         1.92   1.83       —
+official evaluator would prefer distil-v3 BoN; one given only      w2v2-base (3)                     1.99        1.41         1.74   1.71       0.05
+w2v2-lv60 would prefer w2v2-base BoN. Both are correct             w2v2-base (5)                    2.20↑        1.41         1.75   1.79       0.97
+conditional on their evaluator, and incompatible.                  w2v2-base (10)                    1.98        1.40         1.72   1.70       0.08
+                                                                   distil-v3 (3)                     1.88        1.45         1.74   1.69 < .001
+                                                                   distil-v3 (5)                     1.80        1.48         1.75   1.68 < .001
+4.3. Oracle Headroom and Recovery                                  distil-v3 (10)                    1.72        1.44         1.68   1.61 < .001
+To bound how far BoN can go at N =3, we synthesize all             rank-avg (3)                      2.01        1.43         1.74   1.73 0.17
+                                                                   rank-avg (5)                      1.90        1.40         1.66   1.65 .001
+three candidates per sample and transcribe each with every         rank-avg (10)                     1.81        1.41         1.60   1.61 < .001
+evaluator (Table 3, top block). On the official evaluator,
+                                                                   max-rank (3)                      1.99        1.42         1.73   1.71 0.12
+an oracle verifier would drive WER to 1.42%, below F5-             max-rank (5)                      1.80        1.43         1.67   1.63 < .001
+TTS’s reported ∼1.5–1.7% (Chen et al., 2025): headroom             max-rank (10)                     1.80        1.40         1.62   1.61 < .001
+for verifier improvement is substantial. The bottom block
+makes the 2–3× family swing precise: under fwhisper-lgv3,
+distil-v3 recovers 26.0% of headroom vs. only 7.9% for                • max-rank. We pick the candidate with the lowest
+cross-family w2v2-base (3.3×); under w2v2-lv60, w2v2-                   worst-case rank, requiring it to rank well in both fami-
+base recovers 26.1% vs. 18.2% for cross-family distil-v3                lies. This conjunctive form explicitly penalizes single-
+(1.4×). Recovery is a property of the (verifier, evaluator)             family inflation.
+pair, not the verifier alone.
+                                                                   Findings (Figure 1). (i) The single cross-family verifier
+4.4. Scaling and Bias-Corrected Ensembles                          (w2v2-base) under fwhisper-lgv3 regresses from 1.99% at
+                                                                   N =3 to 2.20% at N =5 (p=0.97): more candidates ex-
+To test whether the confound persists at higher N and
+                                                                   pose a same-family-evaluator penalty. (ii) The same-family
+whether cross-family aggregation mitigates it, we synthesize
+                                                                   verifier (distil-v3) scales monotonically on its own fam-
+N =10 candidates per sample and add six BoN configura-
+                                                                   ily (1.88% → 1.72% for N =3→10, p<.001). (iii) Cross-
+tions: single wav2vec 2.0 and Distil-Whisper verifiers at
+                                                                   family rank ensembles match the single best on mean WER
+N ∈ {5, 10}, plus two cross-family rank ensembles over
+                                                                   and are the most cross-evaluator-robust. The rank-avg con-
+the (w2v2-base, distil-v3) pair.
+                                                                   figuration at N =5 is the only one reaching p<0.05 under
+                                                                   all three evaluators at once (.001/.022/.0002); at N =10,
+   • rank-avg. Each verifier independently ranks the N             rank-avg ties distil-v3 at mean 1.61% while winning the
+     candidates by WER+CER score. We then pick the                 hubert-lg column (1.60%).
+     candidate with the lowest average rank across the two
+     families.                                                     Practical rule. With a known same-family evaluator, use
+                                    Best-of-N TTS Evaluation is Confounded by ASR Family Alignment
+
+Table 5. Linear CKA (mean-pooled last hidden state) between au-                                       1.0
+                                                                                                                              B     D
+dio encoders of six ASR checkpoints on 500 F5-TTS-synthesized
+                                                                                                                  A
+
+                                                                                    Pearson r (WER)
+waveforms (a random subset of LibriSpeech test-clean). Aliases
+as in §3: wav2vec 2.0 family (w2v2-base, w2v2-lv60), Whisper                                          0.5
+family (distil-sm, distil-v3, whisper-med; the latter three are Distil-
+Whisper or Whisper checkpoints), HuBERT family (hubert-lg).                                           0.0         C
+                                                                                                                              E
+                     se        0                            isp
+                                                                er-
+                                                                                                      0.5                                       F
+                   -ba     v2-        til-      dis                me      ert
+                w2
+                              lv6          sm      til-               d
+                                                                              -lg                           0.0       0.2   0.4     0.6   0.8       1.0
+                   v2     w2         dis               v3   wh            hub                                                Linear CKA
+                                                                                        Figure 2. CKA does not predict WER agreement across the 42 =6
+                                                                                                                                                   
+ w2v2-base        1.00     0.65       0.14       0.14        0.15          0.67
+ w2v2-lv60        0.65     1.00       0.06       0.05        0.06          0.55         evaluator pairs from {distil-sm, w2v2-lv60, whisper-med, hubert-
+ distil-sm        0.14     0.06       1.00       0.98        0.98          0.39         lg}. Pearson r is computed over 13 BoN configurations on a 500-
+ distil-v3        0.14     0.05       0.98       1.00        0.98          0.40         sample pilot. Pairs: A, distil-sm ↔ w2v2-lv60; B, distil-sm ↔
+ whisper-med      0.15     0.06       0.98       0.98        1.00          0.40         hubert-lg; C, w2v2-lv60 ↔ whisper-med; D, w2v2-lv60 ↔ hubert-
+ hubert-lg        0.67     0.55       0.39       0.40        0.40          1.00         lg; E, whisper-med ↔ hubert-lg; F, distil-sm ↔ whisper-med
+                                                                                        (same-family, red triangle). The all-6 trend (r=−0.36, solid) is
+                                                                                        driven by the same-family outlier F (rWER =−0.52 at CKA 0.978).
+                                                                                        Excluding F, the trend reverses to r=+0.32 (dashed), confirming
+distil-v3 at N =10. Otherwise, use rank-avg or max-rank                                 that CKA does not monotonically predict WER agreement.
+over the cross-family pair at N =5 for the best compute–
+robustness frontier.
+                                                                                        degradation under either predictor. Both may be near their
+                                                                                        resolution limit (UTMOS saturates around 4.0), so human-
+5. Analysis: Toward a Mechanism for the                                                 MOS / NISQA / UTMOSv2 triangulation (Mittag et al.,
+   Confound                                                                             2021; Baba et al., 2024) is deferred. For cross-evaluator
+To test whether the confound reduces to representation sim-                             robustness, rank-avg and max-rank at N =5 reduce WER
+ilarity, we measure linear CKA (Kornblith et al., 2019)                                 under all three evaluators simultaneously, while distil-v3 at
+between audio encoders of six ASR checkpoints on 500                                    N =10 stays flat on w2v2-lv60. The (w2v2-base, distil-v3)
+F5-TTS-synthesized waveforms (a random subset of Lib-                                   pair was fixed in advance as the largest publicly available
+riSpeech test-clean). Table 5 confirms three intuitive clus-                            verifier in each family, prior to any cross-evaluator analysis.
+ters: Whisper–Distil-Whisper (CKA 0.97–0.98 internally),
+wav2vec 2.0 / HuBERT (0.55–0.67), and near-zero cross-                                  6. Discussion and Conclusion
+cluster.
+                                                                                        Any BoN comparison reported under a single ASR evalu-
+The naive prediction (high CKA implies similar WER rank-                                ator is potentially confounded; we recommend reporting
+ings) is not supported (Figure 2). The Whisper-family pair                              WER under at least two ASR families with disjoint train-
+(distil-sm ↔ whisper-med, CKA 0.978) is anti-correlated                                 ing lineages. Our cross-family rank ensembles realize
+(r=−0.52), while the wav2vec 2.0/HuBERT pair (CKA                                       this principle on the selection side: they yield the most
+0.55) agrees nearly perfectly (r=+0.94). Pearson(CKA, r)                                cross-evaluator-robust BoN configurations we test, reach-
+is −0.36 over the six pairs but reverses to +0.32 once the                              ing 1.61% mean WER at N =10 (−12% vs. F5-TTS); the
+same-family outlier is removed: the trend is single-point-                              largest reduction under the official F5-TTS evaluator alone,
+driven.                                                                                 2.06% → 1.72% (−16.5%), comes from the best same-
+The pattern is consistent not with representation similarity                            family verifier. The N =3 oracle WER of 1.42% leaves
+but with an identity- or lineage-level coupling effect: a                               substantial headroom for verifier-design work (e.g., adver-
+verifier’s selections are disproportionately favored by evalu-                          sarial reweighting against in-family inflation).
+ators sharing its ASR lineage, while an independent same-                               Limitations. Our study uses one TTS backbone (F5-TTS)
+family member returns an uninflated score—structurally                                  on LibriSpeech-PC test-clean; generalization to other back-
+analogous to LLM-as-a-judge self-bias (Zheng et al., 2023).                             bones (CosyVoice 2, MaskGCT) and a fourth ASR family
+Disentangling identity- from family-level coupling is left to                           (Parakeet, Canary), plus human-MOS triangulation, is left
+future work.                                                                            to future work.
+
+5.1. Quality and cross-evaluator robustness
+                                                                                        References
+SIM-o and UTMOS at N =3 stay within ±0.001 and                                          Anastassiou, P., Chen, J., Chen, J., Chen, Y., Chen, Z.,
+±0.005 of F5-TTS (0.9426/3.879), with no measurable                                       et al. Seed-TTS: A family of high-quality versatile speech
+                            Best-of-N TTS Evaluation is Confounded by ASR Family Alignment
+
+  generation models. arXiv:2406.02430, 2024.                   Hu, Y., Chen, C., Wang, S., Chng, E. S., and Zhang, C.
+                                                                 Robust zero-shot text-to-speech synthesis with reverse
+Baba, K., Nakata, W., Saito, Y., and Saruwatari, H. The          inference optimization. arXiv:2407.02243, 2024.
+  T05 system for the VoiceMOS challenge 2024: Transfer
+  learning from deep image classifier to naturalness MOS       Ju, Z., Wang, Y., Shen, K., Tan, X., Xin, D., Yang, D., Liu,
+  prediction of high-quality synthetic speech. In IEEE           Y., Leng, Y., Song, K., Tang, S., et al. NaturalSpeech
+  Spoken Language Technology Workshop, pp. 818–824,              3: Zero-shot speech synthesis with factorized codec and
+  2024. doi: 10.1109/SLT61566.2024.10832315.                     diffusion models. ICML, 2024.
+
+Baevski, A., Zhou, Y., Mohamed, A., and Auli, M. wav2vec       Koenecke, A., Nam, A., Lake, E., Nudell, J., Quartey, M.,
+  2.0: A framework for self-supervised learning of speech        Mengesha, Z., Toups, C., Rickford, J. R., Jurafsky, D.,
+  representations. NeurIPS, 2020.                                and Goel, S. Racial disparities in automated speech recog-
+                                                                 nition. Proceedings of the National Academy of Sciences,
+Chen, S., Wang, C., Chen, Z., Wu, Y., Liu, S., Chen, Z., Li,     2020.
+  J., Kanda, N., Yoshioka, T., Xiao, X., et al. WavLM:
+  Large-scale self-supervised pre-training for full stack      Kornblith, S., Norouzi, M., Lee, H., and Hinton, G. Similar-
+  speech processing. IEEE Journal of Selected Topics in          ity of neural network representations revisited. In ICML,
+  Signal Processing, 2022.                                       2019.
+Chen, Y., Niu, Z., Ma, Z., Deng, K., Wang, C., Zhao, J.,       Meister, A., Novikov, M., Karpov, N., Bakhturina, E.,
+  Yu, K., and Chen, X. F5-TTS: A fairytaler that fakes          Lavrukhin, V., and Ginsburg, B. LibriSpeech-PC: Bench-
+  fluent and faithful speech with flow matching. In Pro-        mark for evaluation of punctuation and capitalization
+  ceedings of the 63rd Annual Meeting of the Association        capabilities of end-to-end ASR models. In IEEE Auto-
+  for Computational Linguistics (Volume 1: Long Papers),        matic Speech Recognition and Understanding Workshop
+  pp. 6255–6271, 2025.                                          (ASRU), pp. 1–7, 2023.
+Cooper, E., Huang, W.-C., Toda, T., and Yamagishi, J.          Mittag, G., Naderi, B., Chehadi, A., and Möller, S. NISQA:
+  Generalization ability of MOS prediction networks. In         A deep CNN-self-attention model for multidimensional
+  ICASSP, pp. 8442–8446, 2022.                                  speech quality prediction with crowdsourced datasets. In
+                                                                Interspeech, pp. 2127–2131, 2021.
+Du, Z., Wang, Y., Chen, Q., Shi, X., Lv, X., Zhao, T., Gao,
+  Z., Yang, Y., Gao, C., Wang, H., et al. CosyVoice 2:         Radford, A., Kim, J. W., Xu, T., Brockman, G., McLeavey,
+  Scalable streaming speech synthesis with large language        C., and Sutskever, I. Robust speech recognition via large-
+  models. arXiv:2412.10117, 2024.                                scale weak supervision. In ICML, 2023.
+Eskimez, S. E., Wang, X., Thakker, M., Li, C., Tsai, C.-H.,    Saeki, T., Xin, D., Nakata, W., Koriyama, T., Takamichi, S.,
+  Xiao, Z., Yang, H., Zhu, Z., Tang, M., Tan, X., Liu, Y.,       and Saruwatari, H. UTMOS: UTokyo-SaruLab system
+  Zhao, S., and Kanda, N. E2 tts: Embarrassingly easy fully      for VoiceMOS challenge 2022. In Interspeech, pp. 4521–
+  non-autoregressive zero-shot TTS. arXiv:2406.18009,            4525, 2022.
+  2024.
+                                                               Wang, T., Chen, J., Jia, Q., Wang, S., Fang, R., Wang, H.,
+Feng, S., Halpern, B. M., Kudina, O., and Scharenborg, O.       Gao, Z., Xie, C., Xu, C., Dai, J., Liu, Y., Wu, J., Ding,
+  Towards inclusive automatic speech recognition. Com-          S., Li, L., Huang, Z., Deng, X., Yu, T., Ma, G., Xiao, H.,
+  puter Speech & Language, 84:101567, 2024.                     Chen, Z., Xiang, D., Wang, Y., Zhu, Y., Xiao, Y., Wang,
+                                                                J., Wang, Y., Ding, S., Huang, J., Xu, J., Tayier, Y., Hu,
+Gandhi, S., von Platen, P., and Rush, A. M. Distil-Whisper:     Z., Gao, Y., Zheng, C., Ye, Y., Li, Y., Wan, L., Jiang, X.,
+  Robust knowledge distillation via large-scale pseudo la-      Wang, Y., Cheng, S., Song, Z., Tang, X., Xu, X., Zhang,
+  belling. arXiv:2311.00430, 2023.                              N., Chen, H., Jiang, Y. E., and Zhou, W. Weaver: Foun-
+Ho, J. and Salimans, T. Classifier-free diffusion guid-         dation models for creative writing. arXiv:2401.17268,
+  ance. NeurIPS Workshop on Deep Generative Models              2024.
+  and Downstream Applications (arXiv:2207.12598), 2021.        Wang, Y., Zhan, H., Liu, L., Zeng, R., Guo, H., Zheng, J.,
+Hsu, W.-N., Bolte, B., Tsai, Y.-H. H., Lakhotia, K.,            Zhang, Q., Zhang, X., Zhang, S., and Wu, Z. MaskGCT:
+  Salakhutdinov, R., and Mohamed, A. HuBERT: Self-              Zero-shot text-to-speech with masked generative codec
+  supervised speech representation learning by masked pre-      transformer. In International Conference on Learning
+  diction of hidden units. IEEE/ACM TASLP, 2021.                Representations, 2025.
+                            Best-of-N TTS Evaluation is Confounded by ASR Family Alignment
+
+Yang, Y., Liu, S., Li, J., Hu, Y., Wu, H., Wang, H., Yu,
+  J., Meng, L., Sun, H., Liu, Y., Lu, Y., Yu, K., and
+  Chen, X. Pseudo-autoregressive neural codec language
+  models for efficient zero-shot text-to-speech synthesis.
+  arXiv:2504.10352, 2025.
+Yu, F., Li, Y., and Wang, B. Scaling flaws of verifier-guided
+  search in mathematical reasoning. arXiv:2502.00271,
+  2025.
+Zhang, D., Li, Z., Li, S., Zhang, X., Wang, P., Zhou, Y.,
+  and Qiu, X. SpeechAlign: Aligning speech generation to
+  human preferences. NeurIPS (arXiv:2404.05600), 2024.
+
+Zheng, L., Chiang, W.-L., Sheng, Y., Zhuang, S., Wu, Z.,
+  Zhuang, Y., Lin, Z., Li, Z., Li, D., Xing, E. P., et al.
+  Judging LLM-as-a-judge with MT-Bench and chatbot
+  arena. NeurIPS, 2023.
+

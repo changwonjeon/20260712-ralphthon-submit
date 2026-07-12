@@ -11,3 +11,4 @@ okf_version: "0.1"
 * [Attachments](attachments/) - 제출 템플릿과 관련 첨부파일.
 * [Deliverables](deliverables/) - 수정된 Track 2 계획 및 제출 패키지.
 * [Work](work/) - Track 2 작업 체크리스트와 의사결정 기록.
+* [Review Trials](review_trials/) - 동결된 실제 논문을 사용한 오프라인 리뷰 및 독립 검증 기록.

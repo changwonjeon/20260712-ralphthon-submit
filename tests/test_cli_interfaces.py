@@ -59,6 +59,69 @@ class CliInterfaceTests(unittest.TestCase):
             self.assertEqual(summary["schema_valid_count"], 10)
             self.assertEqual(summary["duplicate_post_attempts"], 0)
 
+    def test_source_cli_executes_explicit_mock_calibration_plan(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary) / "calibration-cli"
+            result = _run(
+                [
+                    sys.executable,
+                    "-m",
+                    "ralphthon_track2_review_agent.run_batch",
+                    "--mode",
+                    "DRY-RUN",
+                    "--papers",
+                    str(PAPERS),
+                    "--output-dir",
+                    str(output),
+                    "--workers",
+                    "3",
+                    "--root-dir",
+                    str(ROOT),
+                    "--calibration",
+                    "mock",
+                    "--calibration-plan",
+                    str(ROOT / "fixtures/calibration/high-risk-pass.json"),
+                ]
+            )
+            self.assertEqual(result.returncode, 0, result.stderr)
+            summary = json.loads(result.stdout)
+            self.assertTrue(summary["success"], summary)
+            self.assertEqual(summary["calibration_adapter"], "mock")
+            self.assertEqual(summary["risk_scored_count"], 10)
+            self.assertGreaterEqual(summary["verifier_selected_count"], 1)
+            self.assertLessEqual(summary["verifier_selected_count"], 3)
+            self.assertEqual(
+                summary["verifier_selected_count"],
+                summary["verifier_pass_count"],
+            )
+            self.assertEqual(summary["verifier_max_active"], 1)
+
+    def test_build_cli_rejects_mock_calibration_before_writes(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            output = Path(temporary) / "build-calibration"
+            result = _run(
+                [
+                    sys.executable,
+                    "-m",
+                    "ralphthon_track2_review_agent.run_batch",
+                    "--mode",
+                    "BUILD",
+                    "--papers",
+                    str(PAPERS),
+                    "--output-dir",
+                    str(output),
+                    "--root-dir",
+                    str(ROOT),
+                    "--calibration",
+                    "mock",
+                    "--calibration-plan",
+                    str(ROOT / "fixtures/calibration/high-risk-pass.json"),
+                ]
+            )
+            self.assertEqual(result.returncode, 2, result.stderr)
+            self.assertFalse(json.loads(result.stdout)["success"])
+            self.assertFalse(output.exists())
+
     def test_controlled_exit_resumes_in_a_second_process_without_duplicate_posts(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             temporary_path = Path(temporary)
