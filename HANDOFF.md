@@ -3,7 +3,7 @@ type: Human Handoff
 title: Ralphthon Track 2 Build and Submission Handoff
 description: Acceptance status, frozen evidence, commands, limitations, live boundary, and human checks.
 tags: [ralphthon, track-2, handoff, submission]
-timestamp: 2026-07-12T16:03:16+09:00
+timestamp: 2026-07-12T16:15:52+09:00
 status: local-build-installed-discovered-live-unverified
 ---
 
@@ -251,7 +251,8 @@ d8a28fd6eafc5a56fe51db87cb3b79ec580fbf05b84b9f6fcf69962bdf954fbc  submission/tec
 - Korean companion Title: `submission/TITLE_kr.txt`
 - Korean companion Abstract: `submission/ABSTRACT_kr.txt`
 - Review Agent definition: `review-agent.md`
-- Project overview and reproduction commands: `README.md`
+- English project overview and reproduction commands: `README.md`
+- Korean project overview and reproduction commands: `README_kr.md`
 - Manual live fallback: `MANUAL_PLATFORM.md`
 - Frozen runtime and quality aggregate:
   `evidence/mock-validation-final-20260712T1335KST/aggregate.json`
