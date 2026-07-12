@@ -1,0 +1,12 @@
+PACKAGE_MANIFEST.txt
+README.md
+index.md
+codex_task_prompt.md
+docs/implementation_roadmap_v4_event_mvp.md
+docs/submission_contract.md
+docs/technical_report_outline.md
+docs/implementation_roadmap_v3.md
+docs/reference_v2_claude.md
+templates/review-agent.md
+submission/TITLE_DRAFT.txt
+submission/ABSTRACT_DRAFT.txt

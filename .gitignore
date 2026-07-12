@@ -1,0 +1,17 @@
+.DS_Store
+
+# Temporary upstream clones and scratch files.
+tmp/
+
+# OMX runtime state. Keep plans, but exclude session-local state and logs.
+.omx/logs/
+.omx/state/
+.omx/metrics.json
+.omx/hud-config.json
+.omx/setup-scope.json
+
+# Local caches and generated noise.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
