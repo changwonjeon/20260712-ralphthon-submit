@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-12T14:23:34+09:00",
+  "executor": "root",
+  "scope": "changed-files-only cleanup followed by fresh full verification",
+  "result": "PASS_WITH_PROJECT_INSTALL_BLOCKER",
+  "production_claim_or_post": false,
+  "cleanup_review": {
+    "root_direct_review": true,
+    "allowlist": ".omx/ralph/changed-files.txt",
+    "report": "evidence/ai-slop-cleaner-report.md",
+    "behavior_change_detected": false,
+    "new_dependency_added": false,
+    "official_upstream_modified": false,
+    "frozen_fixture_modified": false,
+    "raw_evidence_modified": false,
+    "user_launcher_compatibility_fix_modified": false,
+    "retained_reviewer_decisions": [
+      "io_utils directory-fsync OSError compatibility fallback",
+      "_failure_ids permissive unsupported-value fallback"
+    ]
+  },
+  "tests": {
+    "command": "PYTHONDONTWRITEBYTECODE=1 PYTHONPYCACHEPREFIX=/tmp/ralphthon-pycache-post-clean-final PYTHONPATH=src python3 -m unittest discover -s tests -p 'test_*.py' -v",
+    "exit_code": 0,
+    "tests_run": 49,
+    "failures": 0,
+    "errors": 0,
+    "elapsed_seconds": 1.654,
+    "status": "PASS"
+  },
+  "static_checks": {
+    "compileall": "PASS",
+    "git_diff_check": "PASS",
+    "repository_pycache_files": 0
+  },
+  "package_checks": {
+    "wrapper_manifest_entries": 17,
+    "wrapper_manifest_verified": 17,
+    "wrapper_manifest_sha256": "daa71e174640dbc135f9a735bb4d42db99dba4e7abd7802b7aeb7866ac75c7f3",
+    "upstream_manifest_entries": 11,
+    "upstream_manifest_verified": 11,
+    "upstream_recursive_diff": "empty",
+    "upstream_commit": "a9f4f2583648ef4ca54f980f951ae393d153473f",
+    "fixture_manifest_entries": 16,
+    "fixture_manifest_verified": 16,
+    "staged_installer_files": 28,
+    "staged_installer_verified": 28,
+    "status": "PASS"
+  },
+  "codex_surface_checks": {
+    "skill_quick_validate_passed": 2,
+    "skill_quick_validate_total": 2,
+    "native_agent_toml_parsed": 3,
+    "native_agent_toml_total": 3,
+    "skill_agent_yaml_parsed": 2,
+    "skill_agent_yaml_total": 2,
+    "project_install_check_exit_code": 1,
+    "project_install_check_status": "not-installed",
+    "project_install_missing_files": 28,
+    "fresh_session_discovery": "BLOCKED",
+    "blocker": "project .codex is sandbox read-only; verified package remains in staging"
+  },
+  "root_artifact_checks": {
+    "assigned_count": 10,
+    "posted_verified": 10,
+    "post_attempt_count": 10,
+    "duplicate_post_attempts_by_paper": 0,
+    "duplicate_idempotency_keys": 0,
+    "missing_ids": [],
+    "unexpected_posted_ids": [],
+    "manifests": 10,
+    "outbox_json": 10,
+    "clipboard_text": 10,
+    "schema_valid": 10,
+    "status": "PASS_SYNTHETIC_MOCK"
+  },
+  "json_readback": {
+    "json_files_parsed": 568,
+    "jsonl_files_parsed": 31,
+    "jsonl_records_parsed": 1283,
+    "status": "PASS"
+  },
+  "authoritative_runtime_evidence": {
+    "aggregate_path": "evidence/mock-validation-final-20260712T1335KST/aggregate.json",
+    "aggregate_sha256": "239f2de62fcc5a1671b6cf86efc4f3a63077c3e3d2c81ccd2ad04e25a2077910",
+    "normal_runs": 3,
+    "normal_assigned": 30,
+    "normal_posted_verified": 30,
+    "normal_schema_valid": 30,
+    "normal_duplicate_post_attempts": 0,
+    "normal_duplicate_idempotency_keys": 0,
+    "fault_posted_verified": 10,
+    "fault_schema_valid": 10,
+    "fault_duplicate_post_attempts": 0,
+    "malformed_json_repairs": 1,
+    "worker_timeout_recoveries": 1,
+    "claim_timeout_reconciliations": 1,
+    "post_timeout_reconciliations": 1,
+    "ledger_reopen_recoveries": 1,
+    "quality_candidate_tp_fp_fn_f1": [20, 0, 0, 1.0],
+    "quality_baseline_tp_fp_fn_f1": [10, 0, 10, 0.6666666666666666],
+    "evidence_kind": "synthetic_mock_runtime_validation"
+  },
+  "process_restart_evidence": {
+    "path": "evidence/process-restart-proof/aggregate.json",
+    "sha256": "18d536ca72f87e03117af28d5534d10de1b316a3a0dc26b52fd5a2849e0de5d2",
+    "interrupted_exit_code": 75,
+    "interrupted_posted_verified": 4,
+    "resumed_exit_code": 0,
+    "resumed_posted_verified": 10,
+    "resumed_schema_valid": 10,
+    "resumed_duplicate_posts": 0,
+    "ledger_prefix_preserved": true,
+    "completed_artifact_bytes_preserved": true,
+    "status": "PASS_SYNTHETIC_DRY_RUN"
+  },
+  "submission_checks": {
+    "pdf_built_at": "2026-07-12T14:16:01+09:00",
+    "visual_qa_at": "2026-07-12T14:20:57+09:00",
+    "tex_sha256": "d8b17f65cb9f965214127869badf8ce64d4f4749d46607dedda69b46d503c2a0",
+    "pdf_sha256": "b1a8c476f9bf0718d4a64c7192467fad588fe7a35f25380a9d363696548db18f",
+    "title_sha256": "23451a0afe573a7ca17e8de1e81c32a20fe7ff09ec6cfee017253fb888c9147e",
+    "abstract_sha256": "17cee83d5261050d9b4c5f3e9271f6b318109b252a83649dff8bb42eba7f30dd",
+    "tectonic_exit_code": 0,
+    "pages": 3,
+    "body_marker_page": 3,
+    "letter_page": true,
+    "author_metadata": "Anonymous",
+    "custom_metadata": false,
+    "javascript": false,
+    "font_count": 4,
+    "all_fonts_embedded_subset_unicode": true,
+    "type3_fonts": 0,
+    "title_exact_normalized": true,
+    "abstract_exact_normalized": true,
+    "raw_metrics_match": true,
+    "forbidden_identity_path_email_url_author_ack_placeholder_matches": 0,
+    "visual_pages_passed": 3,
+    "visual_pages_total": 3,
+    "render_sha256": [
+      "4f8786f9e3372fe49ec0c3316acf57a91b2c6ba6fc885523904b3dcb3869869c",
+      "a2d52b933d0078cd321318314536effd3f1152c062b99ac2d8144d960718df07",
+      "eaad05f3a46ee9a739a7c20c68510be9b410f244dddeba12aa7016f7c39c67b3"
+    ],
+    "status": "PASS"
+  },
+  "architect_audit": {
+    "agent_type": "architect",
+    "path": "evidence/architect-audit.md",
+    "sha256": "82cef26e70c546d0a20ca0ca291e51f676fdd65afeee032fba0ea436552a3f08",
+    "audit_time": "2026-07-12T14:00:00+09:00",
+    "architecture_verdict": "PASS",
+    "full_p0_verdict_at_audit_time": "BLOCKED",
+    "historical_snapshot_note": "The audit's older TeX, PDF, wrapper, cleanup, and test values are preserved as its pre-clean snapshot. This file supplies the later post-clean read-back."
+  },
+  "remaining_blockers": [
+    "Install all 28 verified staged files into writable project .codex.",
+    "Discover both Skills and native roles in a genuinely fresh Codex session."
+  ],
+  "live_state": "NOT_RUN"
+}

@@ -1,7 +1,8 @@
 #!/bin/zsh
 set -euo pipefail
 
-ROOT="/Users/redux80/Documents/_20260712_Ralphthon"
+SCRIPT_DIR="${0:A:h}"
+ROOT="${SCRIPT_DIR:h}"
 CONFIRMATION="${1:-}"
 
 if [[ "$CONFIRMATION" != "START-RALPH" ]]; then

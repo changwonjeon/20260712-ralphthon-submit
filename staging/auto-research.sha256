@@ -1,0 +1,11 @@
+9f91e7040144b33adbc7ed33c8097b00a88310b74ebbfc15599c71cf4fd1474b  ./SKILL.md
+95ee1cb01f61c31f1fa18389bfb7d1f3e99610c9d69d52a9519927a5e396e06b  ./agents/openai.yaml
+036b6051e57273eadcc2b9080951952a7e02e5d77dc64a573bbc007a6cdb9c69  ./assets/AUTORESEARCH.md
+0b4b8296d0ad2cbdf6d49bd2d8db57748fe8a6a536e5ca0bc8cc216cae51f949  ./assets/experiment-ledger.md
+302bb1fc5aa91ffb7d28ce0d2d08783540c427d33baa503e7a3ca172796ded01  ./assets/track-1-submission-template.md
+67e87b902be1803e3456dae492e4eaf50b5cdad736ddd031372fb9507d91b851  ./assets/track-2-agent-template.md
+cc9a9a4a9570e3abbdf0291d50b4d5826821de3bffb4e369f5e59d86f88ba772  ./assets/track-2-review-template.md
+80d8ace25fce9e7abd976529b74236f8997bd046da130750830a23d4d1d302db  ./assets/vessl-a100-run-card.md
+6edd3bdca04a34c0ffdc4c5bc42f8d008a4d2d02860acf921dacdf4f21c42db5  ./references/vessl-autoresearch-runbook.md
+1742c00ad10094ea99bb15f03a4b98d2d33080459459a360b917d3b4a82f652d  ./references/workflow.md
+2e750cd490d878900287e71ea3843adfd3eab70b4c9a9a5d95222e7db2cb6da6  ./scripts/record_experiment.py

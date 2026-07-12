@@ -1,0 +1,9 @@
+Paper ID: paper-006
+Soundness: 3
+Presentation: 3
+Contribution: 3
+Significance: 2
+Originality: 2
+Overall Recommendation: 4
+Confidence: 3
+Comment: The comparison is clearly reported, but the paper should narrow its claim and add evidence that directly addresses the limitation identified above.

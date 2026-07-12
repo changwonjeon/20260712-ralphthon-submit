@@ -1,0 +1,97 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-12T14:46:40+09:00",
+  "scope": "Post-Ralph project-local installation and genuinely fresh Codex-session discovery",
+  "passed": true,
+  "production_side_effects": false,
+  "project_install": {
+    "status": "PASS",
+    "installer_command": "python3 scripts/install-track2-codex.py --install",
+    "readback_command": "python3 scripts/install-track2-codex.py --check",
+    "installer_status": "installed",
+    "expected_files": 28,
+    "matching_files": 28,
+    "missing_files": 0,
+    "conflicting_files": 0,
+    "skill_files": {
+      "auto-research": 11,
+      "ralphthon-track2-review-agent": 14
+    },
+    "native_agent_files": 3
+  },
+  "fresh_codex_session": {
+    "status": "PASS",
+    "parent_thread_id": "019f54d3-15cb-7161-bdd5-fc2eed55d7d6",
+    "cli_version": "0.144.1",
+    "skills": [
+      {
+        "name": "auto-research",
+        "catalog_visible": true
+      },
+      {
+        "name": "ralphthon-track2-review-agent",
+        "catalog_visible": true
+      }
+    ],
+    "native_roles": [
+      {
+        "agent_role": "track2-review-worker",
+        "agent_path": "/root/track2_review_worker",
+        "agent_nickname": "Hubble",
+        "thread_id": "019f54d3-5a48-7841-b123-a5082c1d7f84",
+        "completion_token": "WORKER_DISCOVERED",
+        "rollout_basename": "rollout-2026-07-12T14-36-05-019f54d3-5a48-7841-b123-a5082c1d7f84.jsonl",
+        "rollout_sha256": "adb68ba5781813a98b3f84ee15c2d4439e8d0d04f2ae062db31cf2ac58a3dc8e"
+      },
+      {
+        "agent_role": "track2-review-verifier",
+        "agent_path": "/root/track2_review_verifier",
+        "agent_nickname": "Chandrasekhar",
+        "thread_id": "019f54d3-634c-7423-82ca-ec2e9dd0105d",
+        "completion_token": "VERIFIER_DISCOVERED",
+        "rollout_basename": "rollout-2026-07-12T14-36-07-019f54d3-634c-7423-82ca-ec2e9dd0105d.jsonl",
+        "rollout_sha256": "8ca1b6463ca686634d44030c53a9e76f4f126010d8df1369f60cacb6d909ae21"
+      },
+      {
+        "agent_role": "track2-submission-auditor",
+        "agent_path": "/root/track2_submission_auditor",
+        "agent_nickname": "Sagan",
+        "thread_id": "019f54d3-7271-7960-9ed2-5fddc9206320",
+        "completion_token": "AUDITOR_DISCOVERED",
+        "rollout_basename": "rollout-2026-07-12T14-36-11-019f54d3-7271-7960-9ed2-5fddc9206320.jsonl",
+        "rollout_sha256": "a52daa9b278835368a80c9893b50da465cc008a325aaa7f52e77e1da54ba0173"
+      }
+    ],
+    "discovery_note": "The initial text-only catalog probe did not enumerate custom native roles. Typed native-agent spawns succeeded, and their saved session metadata records the requested custom roles, paths, shared parent session, and completion tokens; this execution evidence is authoritative for native-role discovery."
+  },
+  "historical_evidence": {
+    "ralph_completion_audit": "evidence/completion-audit.json",
+    "ralph_completion_audit_sha256": "d94facf2c1d4b3d46e083ae099f9fab585eab7069bee7a2f42f02402b56aad87",
+    "note": "The Ralph completion audit and architect audit remain immutable pre-install snapshots. This record resolves their environment-only installation and discovery blocker."
+  },
+  "fresh_regression": {
+    "status": "PASS",
+    "tests": "49/49",
+    "test_elapsed_seconds": 1.637,
+    "installed_skill_quick_validate": "2/2",
+    "installed_native_agent_toml_parse": "3/3",
+    "installed_agent_yaml_parse": "2/2",
+    "compileall": "PASS",
+    "json_documents_parsed": 540,
+    "jsonl_files_parsed": 25,
+    "jsonl_records_parsed": 1174,
+    "git_diff_check": "PASS",
+    "technical_report_pages": 3,
+    "technical_report_tex_sha256": "d8b17f65cb9f965214127869badf8ce64d4f4749d46607dedda69b46d503c2a0",
+    "technical_report_pdf_sha256": "b1a8c476f9bf0718d4a64c7192467fad588fe7a35f25380a9d363696548db18f",
+    "title_sha256": "23451a0afe573a7ca17e8de1e81c32a20fe7ff09ec6cfee017253fb888c9147e",
+    "abstract_sha256": "17cee83d5261050d9b4c5f3e9271f6b318109b252a83649dff8bb42eba7f30dd",
+    "report_forbidden_identity_placeholder_scan": "PASS",
+    "report_fonts": "4/4 embedded and subset; Unicode mapping present; no Type 3 fonts"
+  },
+  "live_boundary": {
+    "production_claim_or_post": false,
+    "live_completion": "NOT_RUN",
+    "next_authorized_gate": "Human submission followed by the 16:35 KST live review window"
+  }
+}

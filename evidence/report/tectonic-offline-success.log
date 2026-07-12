@@ -1,0 +1,23 @@
+COMMAND: TECTONIC_CACHE_DIR=../tmp/pdfs/tectonic-work-cache tectonic -C -b ../tmp/pdfs/tectonic-cache.zip technical-report.tex --keep-logs --keep-intermediates
+WORKING_DIRECTORY: submission
+RESULT: PASS_EXIT_0
+BUILT_AT: 2026-07-12T14:16:01+09:00
+
+note: using only cached resource files
+note: Running TeX ...
+warning: technical-report.tex:78: Underfull \hbox (badness 1803) in paragraph at lines 69--78
+warning: technical-report.tex:120: Underfull \vbox (badness 10000) has occurred while \output is active
+warning: technical-report.tex:156: Underfull \vbox (badness 10000) has occurred while \output is active
+warning: technical-report.tex:175: Underfull \hbox (badness 2142) in paragraph at lines 166--175
+warning: technical-report.tex:226: Underfull \hbox (badness 10000) in paragraph at lines 221--226
+warning: technical-report.tex:226: Underfull \vbox (badness 6236) has occurred while \output is active
+warning: warnings were issued by the TeX engine; use --print and/or --keep-logs for details.
+note: Running xdvipdfmx ...
+note: Writing `technical-report.pdf` (36.3662109375 KiB)
+note: Writing `technical-report.log` (16.4443359375 KiB)
+note: Not writing `technical-report.out`: it would be empty.
+note: Writing `technical-report.aux` (1.2333984375 KiB)
+
+No overfull box remained in the final build. The remaining underfull-box
+warnings did not produce clipping, overlap, orphan text, or broken glyphs in
+the three root-inspected pages.

@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-07-12T14:25:00+09:00",
+  "mode": "ralph",
+  "objective": "Build and verify the official Track 2-only Codex Skill package, native review runtime, synthetic-mock evidence, and anonymous submission artifacts without production claim or post.",
+  "completion_state": "BLOCKED",
+  "passed": false,
+  "architecture_verdict": "PASS",
+  "full_p0_verdict": "BLOCKED",
+  "blocker_scope": "environment installation and fresh-session discovery only",
+  "prompt_to_artifact_checklist": [
+    {
+      "requirement": "Official auto-research Skill pinned and byte-identical",
+      "status": "PASS_IN_STAGING",
+      "evidence": [
+        "staging/.codex/skills/auto-research/",
+        "staging/auto-research.sha256",
+        "11/11 hashes and empty recursive diff",
+        "upstream commit a9f4f2583648ef4ca54f980f951ae393d153473f"
+      ]
+    },
+    {
+      "requirement": "Official and wrapper Skills plus native agents installed in project .codex",
+      "status": "BLOCKED",
+      "evidence": [
+        "scripts/install-track2-codex.py --check-staging: 28/28 PASS",
+        "scripts/install-track2-codex.py --check: not-installed, 28 missing",
+        "evidence/discovery/fresh-session-discovery.md"
+      ]
+    },
+    {
+      "requirement": "Wrapper Skill, references, assets, validators, and native Worker/verifier/auditor",
+      "status": "PASS_IN_STAGING",
+      "evidence": [
+        "staging/.codex/skills/ralphthon-track2-review-agent/",
+        "staging/.codex/agents/",
+        "17/17 wrapper hashes",
+        "two Skill quick_validate passes, three TOML parses, two YAML parses"
+      ]
+    },
+    {
+      "requirement": "Canonical Contribution, Significance, Originality, and Comment preserved independently",
+      "status": "PASS",
+      "evidence": [
+        "src/ralphthon_track2_review_agent/contract.py",
+        "tests/test_review_contract.py",
+        "49/49 full regression"
+      ]
+    },
+    {
+      "requirement": "Per-paper input/evidence hashes frozen before Worker execution",
+      "status": "PASS_SYNTHETIC_MOCK",
+      "evidence": [
+        "manifests/",
+        "src/ralphthon_track2_review_agent/manifest.py",
+        "tests/test_identity_contract.py"
+      ]
+    },
+    {
+      "requirement": "Root-only side effects and three bounded ReviewDraft-only workers",
+      "status": "PASS_ARCHITECTURE_AND_MOCK",
+      "evidence": [
+        "src/ralphthon_track2_review_agent/runtime.py",
+        "staging/.codex/agents/track2-review-worker.toml",
+        "evidence/architect-audit.md"
+      ]
+    },
+    {
+      "requirement": "Mock adapter, bounded queue, lease, atomic ledger, idempotency, and status-first reconciliation",
+      "status": "PASS_SYNTHETIC_MOCK",
+      "evidence": [
+        "evidence/mock-validation-final-20260712T1335KST/aggregate.json",
+        "ledger.jsonl",
+        "summary.json"
+      ]
+    },
+    {
+      "requirement": "Gold fixture, naive baseline, TP/FP/FN, location rule, and threshold frozen before agent execution",
+      "status": "PASS",
+      "evidence": [
+        "fixtures/FROZEN_MANIFEST.sha256",
+        "fixtures/quality/EVALUATION_CONTRACT.md",
+        "evidence/fixture-freeze-validation.json"
+      ]
+    },
+    {
+      "requirement": "Three 10-paper runs, schema 100%, duplicates zero",
+      "status": "PASS_SYNTHETIC_MOCK",
+      "evidence": [
+        "30/30 posted_verified",
+        "30/30 schema-valid",
+        "0 duplicate post attempts and 0 duplicate idempotency keys",
+        "evidence/mock-validation-final-20260712T1335KST/aggregate.json"
+      ]
+    },
+    {
+      "requirement": "Malformed JSON, Worker timeout, claim timeout, post timeout, and restart recovery",
+      "status": "PASS_SYNTHETIC_MOCK",
+      "evidence": [
+        "one verified recovery for each injected fault",
+        "evidence/process-restart-proof/aggregate.json",
+        "exit 75 after 4, fresh-process exit 0 at 10/10, preserved bytes"
+      ]
+    },
+    {
+      "requirement": "Root outbox JSON and clipboard-ready fallback",
+      "status": "PASS_SYNTHETIC_MOCK",
+      "evidence": [
+        "outbox/: 10 schema-valid JSON files",
+        "clipboard/: 10 text files",
+        "root audit 10/10, duplicates 0"
+      ]
+    },
+    {
+      "requirement": "Anonymous ICML 2026 report source/PDF, Title, Abstract, review-agent, README, runbook, and handoff",
+      "status": "PASS",
+      "evidence": [
+        "submission/technical-report.tex",
+        "submission/technical-report.pdf",
+        "submission/TITLE.txt",
+        "submission/ABSTRACT.txt",
+        "review-agent.md",
+        "README.md",
+        "MANUAL_PLATFORM.md",
+        "HANDOFF.md"
+      ]
+    },
+    {
+      "requirement": "Tectonic PDF, page/body/font/anonymity/placeholder/metric validation",
+      "status": "PASS",
+      "evidence": [
+        "evidence/report/report-validation.txt",
+        "TeX d8b17f65cb9f965214127869badf8ce64d4f4749d46607dedda69b46d503c2a0",
+        "PDF b1a8c476f9bf0718d4a64c7192467fad588fe7a35f25380a9d363696548db18f",
+        "3 pages, body marker page 3, 4 embedded/subset/Unicode fonts, no Type 3",
+        "root visual QA 3/3 at 2026-07-12T14:20:57+09:00"
+      ]
+    },
+    {
+      "requirement": "Independent native architect audit",
+      "status": "PASS_FOR_STAGED_ARCHITECTURE_FULL_P0_BLOCKED",
+      "evidence": [
+        "agent_type=architect",
+        "evidence/architect-audit.md",
+        "SHA-256 82cef26e70c546d0a20ca0ca291e51f676fdd65afeee032fba0ea436552a3f08"
+      ]
+    },
+    {
+      "requirement": "Changed-files-only ai-slop cleanup and post-clean full regression",
+      "status": "PASS",
+      "evidence": [
+        "evidence/ai-slop-cleaner-report.md",
+        "evidence/post-clean-verification.json",
+        "49/49 tests, compileall PASS, all package and submission checks PASS"
+      ]
+    },
+    {
+      "requirement": "Fresh-session discovery of both Skills",
+      "status": "BLOCKED",
+      "evidence": [
+        "project .codex sandbox write denial",
+        "28 project destinations missing",
+        "evidence/discovery/fresh-session-discovery.md"
+      ]
+    },
+    {
+      "requirement": "Production claim/post and live completion",
+      "status": "NOT_RUN",
+      "evidence": [
+        "production claim/post prohibited during this Ralph build",
+        "bundled CLI rejects LIVE",
+        "MANUAL_PLATFORM.md defines the authorized fallback"
+      ]
+    }
+  ],
+  "fresh_verification_evidence": [
+    "49/49 unittest regression PASS in 1.654s",
+    "compileall PASS; git diff --check PASS; repository pycache files 0",
+    "wrapper 17/17; upstream 11/11; fixtures 16/16; staged installer 28/28",
+    "two Skills quick_validate PASS; three native TOMLs and two agent YAML files parse",
+    "root audit assigned 10, posted_verified 10, schema 10, duplicate attempts/keys 0",
+    "568 JSON files and 31 JSONL files with 1283 records parse",
+    "PDF programmatic and 3-page visual audit PASS",
+    "raw runtime and quality values match report, Abstract, README, review-agent, and HANDOFF"
+  ],
+  "evidence_readback": {
+    "post_clean_verification_path": "evidence/post-clean-verification.json",
+    "post_clean_verification_sha256": "1d087e633513f2ed39164a54be58efcd8ed79e3b91ce534986daa0c71ae49977",
+    "architect_audit_path": "evidence/architect-audit.md",
+    "architect_audit_sha256": "82cef26e70c546d0a20ca0ca291e51f676fdd65afeee032fba0ea436552a3f08",
+    "architect_snapshot_note": "Architect audit values are preserved as the 14:00 KST pre-clean snapshot. Latest report hashes and post-clean results are independently recomputed here.",
+    "ralph_state_written": true,
+    "ralph_state_read_back": true,
+    "ralph_state_active": false,
+    "ralph_state_run_outcome": "blocked_on_user",
+    "ralph_state_lifecycle_outcome": "blocked",
+    "ralph_state_completion_audit_passed": false,
+    "ralph_state_checklist_nonempty": true,
+    "ralph_state_verification_evidence_nonempty": true
+  },
+  "remaining_blocked_items": [
+    "Materialize the verified 28-file staged package under writable project .codex.",
+    "Start a genuinely fresh Codex session and discover both Skills plus native roles."
+  ],
+  "goal_mode_readback": {
+    "status": "blocked",
+    "recorded_at": "2026-07-12T14:31:26+09:00",
+    "reason": "All remaining required work is the repeatedly verified project .codex installation and fresh-session discovery environment blocker."
+  },
+  "stop_reason": "All safe local build, cleanup, audit, and submission work is verified. The only unmet P0 items require a less restrictive project .codex and a fresh external session; no further in-scope retry is authorized or useful."
+}

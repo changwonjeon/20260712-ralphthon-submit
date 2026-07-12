@@ -1,0 +1,82 @@
+TECHNICAL REPORT FINAL POST-CLEAN VALIDATION
+validated_at: 2026-07-12T14:23:34+09:00
+pdf_built_at: 2026-07-12T14:16:01+09:00
+visual_qa_at: 2026-07-12T14:20:57+09:00
+
+Artifacts
+- submission/technical-report.tex
+- submission/technical-report.pdf
+- submission/TITLE.txt
+- submission/ABSTRACT.txt
+
+Tectonic build
+- PASS: the latest TeX was built through the offline local bundle with exit 0.
+- Command: TECTONIC_CACHE_DIR=../tmp/pdfs/tectonic-work-cache tectonic -C -b ../tmp/pdfs/tectonic-cache.zip technical-report.tex --keep-logs --keep-intermediates
+- Working directory: submission
+- Exact build output: evidence/report/tectonic-offline-success.log
+- Final TeX log has no overfull boxes. Remaining underfull warnings were visually inspected.
+- Default-bundle failures remain preserved in evidence/report/tectonic-network-attempt.log and evidence/report/tectonic-only-cached-attempt.log.
+
+Programmatic checks
+- title_exact_normalized=PASS
+- abstract_exact_normalized=PASS
+- raw_evidence_hashes=PASS
+- raw_metrics_recompute=PASS
+- report_abstract_readme_agent_handoff_numbers=PASS
+- page_count=PASS (3, maximum 4)
+- body_marker_page=PASS (page 3, maximum 4)
+- metadata_author=PASS (Anonymous)
+- pdf_text_forbidden_scan=PASS
+- pdf_metadata_forbidden_scan=PASS
+- submission_source_forbidden_scan=PASS
+- font_embedding_subset_unicode=PASS
+- type3_fonts=PASS (none)
+- official_style=PASS (official ICML 2026 package, letter page, preliminary notice visible)
+
+Forbidden scans covered participant name/handle patterns, changwonjeon,
+redux80, local absolute paths including /Users/, email addresses, personal
+GitHub URLs, explicit author/thanks commands, acknowledgments, and placeholder/
+TODO/TBD/FIXME/lorem-ipsum markers. `Author: Anonymous` PDF metadata is the
+intended anonymous value and is explicitly allowed.
+
+PDF properties
+- Pages: 3
+- BODY-END-MARKER page: 3
+- Page size: 612 x 792 points (letter)
+- Author metadata: Anonymous
+- Custom metadata: no
+- JavaScript: no
+- Fonts: four fonts; every font is embedded, subset, and Unicode-capable; no Type 3 font.
+
+Visual QA
+- PASS at 2026-07-12T14:20:57+09:00: root inspected all three latest PDF pages at original image detail.
+- Page 1: title, abstract, architecture figure, text columns, notice, and page number are legible with no clipping or overlap.
+- Page 2: runtime table and all prose are legible; no clipping, overlap, or broken glyphs.
+- Page 3: quality table, limitations, conclusion, BODY-END-MARKER, and both references are legible; the marker precedes References and no orphan reference continuation remains.
+- Fresh 150-DPI renders are byte-identical to the persistent renders.
+- 4f8786f9e3372fe49ec0c3316acf57a91b2c6ba6fc885523904b3dcb3869869c  evidence/report/technical-report-final-page-1.png
+- a2d52b933d0078cd321318314536effd3f1152c062b99ac2d8144d960718df07  evidence/report/technical-report-final-page-2.png
+- eaad05f3a46ee9a739a7c20c68510be9b410f244dddeba12aa7016f7c39c67b3  evidence/report/technical-report-final-page-3.png
+
+Post-clean regression
+- 49/49 tests PASS in 1.654 seconds.
+- compileall, git diff check, and repository pycache scan PASS.
+- wrapper 17/17, official upstream 11/11, frozen fixtures 16/16, and staged installer 28/28 PASS.
+- both Skills pass quick_validate; three native-agent TOMLs and two Skill agent YAML files parse.
+- root audit is 10/10 posted_verified, schema 10/10, duplicate attempts/keys 0.
+
+Authoritative evidence
+- 239f2de62fcc5a1671b6cf86efc4f3a63077c3e3d2c81ccd2ad04e25a2077910  evidence/mock-validation-final-20260712T1335KST/aggregate.json
+- 18d536ca72f87e03117af28d5534d10de1b316a3a0dc26b52fd5a2849e0de5d2  evidence/process-restart-proof/aggregate.json
+
+Final SHA-256 read-back
+- d8b17f65cb9f965214127869badf8ce64d4f4749d46607dedda69b46d503c2a0  submission/technical-report.tex
+- b1a8c476f9bf0718d4a64c7192467fad588fe7a35f25380a9d363696548db18f  submission/technical-report.pdf
+- 23451a0afe573a7ca17e8de1e81c32a20fe7ff09ec6cfee017253fb888c9147e  submission/TITLE.txt
+- 17cee83d5261050d9b4c5f3e9271f6b318109b252a83649dff8bb42eba7f30dd  submission/ABSTRACT.txt
+
+Claim boundary
+- Quantitative results are deterministic synthetic-mock evidence only.
+- The two-process result is a DRY-RUN interruption/resume proof only.
+- No production claim or post occurred.
+- No live-platform throughput, completion, or unseen-paper quality claim is made.

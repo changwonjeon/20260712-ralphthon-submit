@@ -1,0 +1,270 @@
+\documentclass{article}
+
+\usepackage{microtype}
+\usepackage{booktabs}
+\usepackage{hyperref}
+\makeatletter
+\def\input@path{{../attachments/icml2026/}}
+\makeatother
+\usepackage{icml2026}
+
+\hypersetup{
+  pdftitle={Evidence-Bound Review Under a Fixed Deadline: A Reliability Contract for ICML-Style Review},
+  pdfauthor={Anonymous},
+  pdfsubject={Anonymous Track 2 technical report},
+  pdfkeywords={scientific review, evidence trace, reliable orchestration}
+}
+\icmltitlerunning{Evidence-Bound Review Under a Fixed Deadline}
+
+% The event requires a fully anonymous report. Preserve the official ICML
+% preliminary notice while omitting the style's affiliation and correspondence
+% wrapper, which otherwise emits demonstration identity fields in blind mode.
+\makeatletter
+\renewcommand{\printAffiliationsAndNotice}[1]{%
+  \global\icml@noticeprintedtrue
+  {\let\thefootnote\relax
+    \footnotetext{\hspace*{-\footnotesep}\Notice@String}}%
+}
+\makeatother
+
+\begin{document}
+
+\twocolumn[
+  \icmltitle{Evidence-Bound Review Under a Fixed Deadline: \\
+    A Reliability Contract for ICML-Style Review}
+  \vskip 0.3in
+]
+
+\printAffiliationsAndNotice{}
+
+\begin{abstract}
+Time-bounded scientific review must combine evidence tracing with reliable
+batch execution. We implement an anonymous Track 2 review system that keeps
+platform side effects in a single root coordinator, delegates paper-local
+drafting to three bounded workers, and validates a canonical review schema
+before any post attempt. Across three deterministic 10-paper synthetic-mock
+runs, the runtime completed 30/30 assigned reviews with 100\% schema validity
+and zero duplicate post attempts or idempotency keys; a separate fault run
+completed 10/10 with schema validity 10/10, no duplicates, one recovery each
+for malformed JSON output, worker timeout, claim timeout, and post timeout, and
+one in-process ledger reopen. In an actual two-process dry-run, the first
+process exited 75 after four mock-verified papers and a fresh process exited 0
+at 10/10 with schema validity 10/10 and no duplicates while preserving the
+four-paper ledger prefix and completed manifest and outbox bytes. On frozen
+seeded synthetic issues, the deterministic reviewer scored TP 20, FP 0, FN 0,
+and F1 1.0, compared with TP 10, FP 0, FN 10, and F1 0.6667 for the naive
+baseline. These measurements are mock-only and do not establish live-platform
+throughput or review quality on unseen papers.
+\end{abstract}
+
+\section{Problem and Contract}
+
+Track 2 requires an ICML-style review agent and a structured review of a frozen
+paper. The live operating window is 25 minutes, so review quality and batch
+reliability are coupled: a well-reasoned draft is not useful if it is lost,
+duplicated, or posted without confirmation. The system therefore treats
+evidence identity, review validity, and side-effect state as one end-to-end
+contract.
+
+The official upstream skill is pinned at commit
+\texttt{a9f4f258...153473f}. Its Track 2-only path
+requires no new training, GPU, experiment service, or training metric. It
+requires frozen paper and evidence hashes, an independently frozen agent
+definition, a structured result, and explicit reporting when supplied evidence
+is insufficient. The local wrapper preserves the upstream
+\textit{Contribution} assessment while retaining the event fields
+\textit{Significance}, \textit{Originality}, and \textit{Comment}; it does not
+convert one field into another.
+
+\section{System Design}
+
+\subsection{Single Owner for Side Effects}
+
+A root coordinator is the only component permitted to discover assignments,
+claim papers, inspect remote status, post reviews, or update the shared ledger.
+Three persistent review workers receive one frozen paper manifest at a time and
+return only a structured \texttt{ReviewDraft}. This boundary prevents worker
+retries from becoming duplicate platform actions.
+
+\begin{figure}[t]
+  \centering
+  \fbox{\parbox{0.92\columnwidth}{
+    \centering
+    Serialized platform lane: discover, claim, reconcile, post, verify
+    \par\smallskip
+    $\downarrow$ frozen manifest and bounded lease
+    \par\smallskip
+    Three review workers: paper-local evidence analysis only
+    \par\smallskip
+    $\downarrow$ \texttt{ReviewDraft}
+    \par\smallskip
+    Deterministic schema validation and atomic ledger transition
+  }}
+  \caption{Authority is narrow by construction. Workers cannot produce remote
+  side effects or mutate shared state.}
+  \label{fig:architecture}
+\end{figure}
+
+\subsection{Frozen Inputs and Evidence Trace}
+
+Before a worker starts, the coordinator records the paper identifier, paper
+file identity, SHA-256 and size, evidence file identities, hashes and sizes,
+aggregate input and evidence hashes, agent version, prompt hash, and schema hash
+in a per-paper manifest. The frozen corpus supplies the allowed file paths
+separately, and Root grants the active lease separately from the manifest.
+Unsafe paper identifiers are rejected before any artifact or ledger write. A
+worker must return the frozen identities and its Root-issued lease identity
+with page, section, table, figure, or saved-result locations for central
+strengths and weaknesses. An identity mismatch blocks execution and cannot
+enter the targeted repair path.
+
+\subsection{Canonical Review Shape}
+
+The draft contains Summary, Strengths, Weaknesses, Questions, Ethics and
+Limitations, Evidence Trace, and score rationales. It carries Soundness,
+Presentation, Contribution, Significance, Originality, Overall Recommendation,
+Confidence, and a constructive Comment as distinct values. A deterministic
+validator checks required fields, integer ranges, non-empty prose, lease and
+paper identity, evidence locations, and forbidden filler text. At most one
+targeted repair may address a schema defect; it may not replace the frozen
+paper or evidence.
+
+\section{Reliability Model}
+
+The coordinator uses a bounded queue with a default high-water mark of three,
+one active lease per paper, append-only ledger writes with atomic snapshot
+replacement, and idempotency keys for post intents. A timed-out worker may be
+re-queued once under the bounded retry policy while Root retains the
+deterministic lease. Malformed output records a validator-reject state and its
+validation errors before it can enter the single targeted repair path.
+
+Claim and post timeouts are ambiguous side effects. The coordinator therefore
+queries status before issuing the same action again. A post attempt remains
+\texttt{post\_unknown} until remote state resolves it to verified success or a
+safe retry. The only live completion condition is
+\texttt{posted\_verified == assigned\_count}. Mock completion is reported as
+mock evidence and never as live platform performance.
+
+\section{Evaluation Protocol}
+
+Evaluation is split into quality and runtime contracts. Quality cases are
+seeded with issue type and evidence location before any agent call. A naive
+single-pass reviewer is frozen as the baseline. Issue matching reports true
+positives, false positives, and false negatives; location matching follows the
+predeclared page, section, table, and figure rules. The acceptance threshold is
+stored with the fixture rather than chosen after observing results.
+
+Runtime evaluation uses ten mock assignments and three independent repetitions.
+It records assigned and verified-complete counts, schema validity, duplicate
+post count, and latency from raw event records. Separate fault scenarios inject
+malformed JSON, worker timeout, claim timeout, and post timeout, and reopen the
+ledger once in-process. Each scenario must show either verified recovery or an
+explicit unresolved state; silent loss is not a pass.
+
+\section{Synthetic Mock Results}
+
+Table~\ref{tab:runtime} reports only deterministic synthetic fixtures and the
+mock adapter. Across three normal runs, all 30 assigned paper instances reached
+mock \texttt{posted\_verified}; all 30 drafts passed the schema, and duplicate
+post attempts and duplicate idempotency keys were both zero. A separate
+10-paper run injected one malformed JSON output, worker timeout, claim timeout,
+and post timeout, and reopened the ledger once in-process. Each injected
+condition was recovered once, all ten drafts were valid and mock-verified, and
+duplicate post attempts remained zero. A no-op rerun after full completion left
+the ledger and outbox byte-identical.
+
+Actual process recovery was tested separately. One process durably exited with
+code 75 after four mock-verified papers. A fresh process opened the same output
+directory and inputs, exited 0 at 10/10 mock verification with schema validity
+10/10 and zero duplicate posts or keys, preserved the four-paper ledger prefix,
+and preserved the completed manifest and outbox bytes.
+
+\begin{table}[t]
+  \caption{Deterministic synthetic-mock runtime evidence. No production claim
+  or post occurred.}
+  \label{tab:runtime}
+  \centering
+  \small
+  \begin{tabular}{@{}lrrr@{}}
+    \toprule
+    Run & Verified & Schema & Dup. \\
+    \midrule
+    Normal, three repetitions & 30/30 & 30/30 & 0 \\
+    Fault injection & 10/10 & 10/10 & 0 \\
+    Two-process resume & 10/10 & 10/10 & 0 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+On the pre-frozen seeded synthetic issue set, the deterministic reviewer found
+20 true positives, zero false positives, and zero false negatives, yielding F1
+1.0. The naive single-pass baseline found 10 true positives, zero false
+positives, and 10 false negatives, yielding F1 0.6667. Both had location
+accuracy 1.0 under the frozen location rule. These results test deterministic
+fixture recognition, not scientific judgment or generalization.
+
+\begin{table}[t]
+  \caption{Seeded synthetic-issue quality evaluation.}
+  \label{tab:quality}
+  \centering
+  \small
+  \begin{tabular}{@{}lrrrr@{}}
+    \toprule
+    Reviewer & TP & FP & FN & F1 \\
+    \midrule
+    Deterministic runtime & 20 & 0 & 0 & 1.0000 \\
+    Naive single pass & 10 & 0 & 10 & 0.6667 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+Runtime and quality values come from the frozen
+\nolinkurl{evidence/mock-validation-final-20260712T1335KST/aggregate.json}.
+The actual process result comes from
+\nolinkurl{evidence/process-restart-proof/aggregate.json}. Values above are
+direct aggregates or four-decimal rounding of their stored values.
+
+\section{Limitations}
+
+Passing mock runs cannot establish live platform throughput, submission
+success, review correctness on unseen research, or agreement with human
+judgment. The runtime elapsed times reflect in-process synthetic fixtures and
+are intentionally not used as a live speed claim. Worker-timeout evidence uses
+a mock adapter \texttt{TimeoutError} and bounded recovery; it does not prove
+that a running thread was forcibly killed.
+
+Further limitations are structural. Evidence locations can show where a claim
+was derived but cannot guarantee the claim is correct. Originality assessment
+is limited to the submitted paper and its supplied references. A deterministic
+schema validator can reject malformed reviews but cannot certify scientific
+quality. The live adapter remains unspecified until read-only discovery reveals
+the actual platform contract; no endpoint or selector is assumed here.
+
+\section{Conclusion}
+
+The design combines frozen evidence identity, a narrow side-effect owner,
+bounded paper-local workers, deterministic validation, and status-first
+reconciliation. Its evaluation contract separates review quality from runtime
+reliability and separates mock evidence from live outcomes. Deterministic mock
+runs satisfy the frozen runtime, seeded-fixture, and two-process resume checks,
+while live platform behavior and unseen-paper review quality remain unmeasured.
+
+\begin{center}
+  \small\texttt{BODY-END-MARKER}
+\end{center}
+
+\begin{thebibliography}{2}
+
+\bibitem[Ralphthon ICML organizers(2026a)]{officialskill}
+Ralphthon ICML organizers.
+\newblock Auto Research Skill, Track 2-only frozen-paper path.
+\newblock Repository commit
+\nolinkurl{a9f4f2583648ef4ca54f980f951ae393d153473f}, 2026.
+
+\bibitem[Ralphthon ICML organizers(2026b)]{eventguide}
+Ralphthon ICML organizers.
+\newblock Track 2 rules, 2026.
+
+\end{thebibliography}
+
+\end{document}

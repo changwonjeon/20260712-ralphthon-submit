@@ -1,0 +1,36 @@
+{
+  "evidence_kind": "fresh_test_suite_validation",
+  "validated_at_utc": "2026-07-12T04:11:41Z",
+  "commands": [
+    "python3 -m unittest discover -s tests -p 'test_*.py' -v",
+    "shasum -a 256 -c fixtures/FROZEN_MANIFEST.sha256",
+    "PYTHONPYCACHEPREFIX=/tmp/ralphthon-pycache python3 -m py_compile tests/*.py src/ralphthon_track2_review_agent/*.py"
+  ],
+  "exit_code": 0,
+  "tests_run": 39,
+  "failures": 0,
+  "errors": 0,
+  "frozen_hashes_verified": 16,
+  "python_compile": "passed",
+  "runtime_evidence": "evidence/mock-validation-20260712T1309KST/aggregate.json",
+  "measured": {
+    "normal_runs": 3,
+    "assigned_per_run": 10,
+    "posted_verified_total": 30,
+    "schema_valid_rate": 1.0,
+    "duplicate_posts": 0,
+    "baseline_tp_fp_fn": [10, 0, 10],
+    "baseline_f1": 0.6666666666666666,
+    "seeded_mock_tp_fp_fn": [20, 0, 0],
+    "seeded_mock_f1": 1.0,
+    "failure_injections_recovered": [
+      "malformed_json",
+      "worker_timeout",
+      "claim_timeout",
+      "post_timeout",
+      "process_restart"
+    ],
+    "restart_ledger_and_outbox_byte_idempotent": true
+  },
+  "warning": "Synthetic fixtures and mock adapter only; not live-platform performance or a generalization estimate."
+}

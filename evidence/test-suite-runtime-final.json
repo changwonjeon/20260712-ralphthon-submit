@@ -1,0 +1,54 @@
+{
+  "evidence_kind": "fresh_runtime_and_skill_validation",
+  "validated_at_utc": "2026-07-12T04:37:36Z",
+  "commands": [
+    "python3 -m unittest discover -s tests -p 'test_*.py' -v",
+    "shasum -a 256 -c staging/ralphthon-track2-review-agent.sha256 (from staging/)",
+    "shasum -a 256 -c ../../../auto-research.sha256 (from staging/.codex/skills/auto-research/)",
+    "shasum -a 256 -c fixtures/FROZEN_MANIFEST.sha256",
+    "python3 scripts/install-track2-codex.py --check-staging",
+    "skill-creator/scripts/quick_validate.py staging/.codex/skills/ralphthon-track2-review-agent"
+  ],
+  "exit_code": 0,
+  "tests_run": 49,
+  "failures": 0,
+  "errors": 0,
+  "wrapper_hashes_verified": 17,
+  "upstream_hashes_verified": 11,
+  "frozen_fixture_hashes_verified": 16,
+  "installer_files_verified": 28,
+  "quick_validate": "Skill is valid!",
+  "runtime_evidence": {
+    "path": "evidence/mock-validation-final-20260712T1335KST/aggregate.json",
+    "sha256": "239f2de62fcc5a1671b6cf86efc4f3a63077c3e3d2c81ccd2ad04e25a2077910"
+  },
+  "actual_process_restart_evidence": {
+    "path": "evidence/process-restart-proof/aggregate.json",
+    "sha256": "18d536ca72f87e03117af28d5534d10de1b316a3a0dc26b52fd5a2849e0de5d2",
+    "interrupted_exit_code": 75,
+    "resumed_exit_code": 0,
+    "ledger_prefix_preserved": true,
+    "completed_manifest_and_outbox_hashes_preserved": true
+  },
+  "measured": {
+    "normal_runs": 3,
+    "assigned_per_run": 10,
+    "posted_verified_total": 30,
+    "schema_valid_rate": 1.0,
+    "duplicate_posts": 0,
+    "baseline_tp_fp_fn": [10, 0, 10],
+    "baseline_f1": 0.6666666666666666,
+    "seeded_mock_tp_fp_fn": [20, 0, 0],
+    "seeded_mock_f1": 1.0,
+    "faults_recovered": [
+      "malformed_json",
+      "worker_timeout",
+      "claim_timeout",
+      "post_timeout",
+      "in_process_ledger_reopen"
+    ],
+    "actual_two_process_resume": true
+  },
+  "local_pycache_files": 0,
+  "warning": "Synthetic fixtures and mock adapter only; not live-platform performance or a generalization estimate."
+}

@@ -1,0 +1,31 @@
+timestamp: 2026-07-12T13:15:34+09:00
+
+command: installed skill-creator quick_validate.py against staged wrapper
+output: Skill is valid!
+
+command: Ruby YAML safe_load of staged SKILL.md frontmatter
+output: ruby-yaml: valid
+
+command: Python 3.13 tomllib parse of staging/.codex/agents/*.toml
+output: toml: 3 valid
+
+command: python3 -m json.tool on review-draft.schema.json and review-output-template.json
+output: json: 2 valid
+
+command: Python 3.13 py_compile of install script and staged Skill scripts
+output: scripts: compiled
+
+command: staged validate_review.py review-output-template.json --json
+output: {"errors": [], "review": "staging/.codex/skills/ralphthon-track2-review-agent/assets/review-output-template.json", "valid": true}
+
+command: python3 scripts/install-track2-codex.py --check-staging
+output: combined install-manifest: 28/28 match; skills=['auto-research', 'ralphthon-track2-review-agent']
+
+command: cd staging && shasum -a 256 -c ralphthon-track2-review-agent.sha256
+output: wrapper-sha: 17 OK
+
+command: cd staging/.codex/skills/auto-research && shasum -a 256 -c ../../../auto-research.sha256
+output: upstream-sha: 11 OK
+
+command: python3 scripts/install-track2-codex.py --check
+output: status=not-installed; missing=28; match=0; conflicts=0

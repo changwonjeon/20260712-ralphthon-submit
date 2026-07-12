@@ -4,7 +4,8 @@ set -euo pipefail
 # This file is prepared before the event but is not started until the user
 # explicitly starts Ralph. Ralph owns its normal 15:20/15:28 shutdown gates.
 
-ROOT="/Users/redux80/Documents/_20260712_Ralphthon"
+SCRIPT_DIR="${0:A:h}"
+ROOT="${SCRIPT_DIR:h}"
 cd "$ROOT"
 
 sleep_until() {

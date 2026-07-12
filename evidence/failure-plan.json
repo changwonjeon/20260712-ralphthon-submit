@@ -1,0 +1,7 @@
+{
+  "malformed_json": ["paper-001"],
+  "worker_timeout": ["paper-002"],
+  "claim_timeout": ["paper-003"],
+  "post_timeout": ["paper-004"],
+  "process_restart_after": 5
+}

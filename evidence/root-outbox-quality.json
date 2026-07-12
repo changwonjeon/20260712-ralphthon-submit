@@ -1,0 +1,24 @@
+{
+  "baseline_metrics": {
+    "f1": 0.6666666666666666,
+    "fn": 10,
+    "fp": 0,
+    "location_accuracy": 1.0,
+    "paper_coverage": 1.0,
+    "precision": 1.0,
+    "recall": 0.5,
+    "tp": 10
+  },
+  "metrics": {
+    "f1": 1.0,
+    "fn": 0,
+    "fp": 0,
+    "location_accuracy": 1.0,
+    "paper_coverage": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "tp": 20
+  },
+  "threshold_passed": true,
+  "warning": "Synthetic seeded-fixture evaluation; not live-platform quality."
+}
