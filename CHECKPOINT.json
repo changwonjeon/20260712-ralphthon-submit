@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "mode": "preflight",
+  "last_completed_gate": "specification",
+  "next_gate": "user-authorized-ralph-launch",
+  "updated_at": "2026-07-12T12:15:45+09:00",
+  "deadline": "2026-07-12T15:30:00+09:00",
+  "p0": {
+    "official_contract_frozen": true,
+    "environment_smoke": true,
+    "ralph_goal_frozen": true,
+    "skill_built": false,
+    "mock_10_papers_verified": false,
+    "submission_package_verified": false
+  }
+}
+

@@ -66,3 +66,9 @@ PDF SHA-256은 `8d5021163643bfff3c9f558f4b15d539fae9c489c01e96d32f8c89bd2e5126d4
 ## 2026-07-12 12:04 — 사용자 사전 설정 확인
 
 사용자가 `openagentreview.org` 로그인 완료 화면을 제공했고 Mac 전원이 연결되어 있음을 확인했다. 로그인 계정 메뉴가 표시되므로 기본 인증과 세션은 정상이다. 화면에는 active venue와 open submission venue가 아직 없으므로 행사 venue가 공개된 뒤 논문 목록과 PDF 접근만 추가 확인한다. 실제 claim과 post는 16:35 전 production에서 시도하지 않는다.
+
+## 2026-07-12 12:15 — Ralph prelaunch 동결
+
+tmux 3.7b와 Tectonic 0.16.9를 설치했다. tmux에서 Codex·OMX doctor를 실행했고 Tectonic으로 공식 ICML 예제 TeX를 7페이지 PDF로 빌드했다. Ralph context snapshot, `RALPH_GOAL.md`, guarded launcher, deadline watcher, checkpoint, failure ledger, handoff, root README와 SHA-256 manifest를 생성했다.
+
+실제 `omx ralph` 실행 권한은 사용자에게 있다. 행사 진행에 맞춘 사용자의 명시적인 시작 신호 전에는 launcher, caffeinate keeper, deadline watcher를 실행하지 않는다.

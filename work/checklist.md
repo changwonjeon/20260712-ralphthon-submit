@@ -45,8 +45,11 @@ timestamp: 2026-07-12T11:00:00+09:00
 - [x] 무인 반복 계약, checkpoint, failure ledger, feature freeze, handoff를 정의한다.
 - [x] OpenAgentReview 로그인과 기본 세션 확인을 완료한다.
 - [ ] 행사 venue가 공개된 뒤 논문 목록·PDF의 read-only smoke test를 완료한다.
-- [ ] tmux 기반 OMX Ralph 또는 native goal 실행 표면을 확정하고 smoke test한다.
-- [ ] 작업폴더 Git baseline과 Ralph Goal hash를 동결한다.
+- [x] tmux 기반 OMX Ralph 실행 표면을 확정하고 tmux에서 Codex·OMX smoke test를 통과한다.
+- [x] 작업폴더 Git baseline을 private 원격에 push한다.
+- [x] Ralph Goal과 context snapshot hash를 동결한다.
 - [x] Mac 전원 연결을 확인한다.
-- [ ] `caffeinate` 적용과 PDF 생성 경로를 확인한다.
+- [x] `caffeinate` launcher와 Tectonic PDF 생성 경로를 확인한다.
 - [ ] 12:30에 Ralph Loop를 시작해 Skill과 제출자료 구현을 실행한다.
+- [x] GitHub 루트 `README.md`의 pre-Ralph 버전을 작성한다.
+- [ ] Ralph가 루트 `README.md`를 실제 검증 결과와 동기화한다.
